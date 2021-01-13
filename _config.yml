@@ -4,7 +4,7 @@ description:      Blog of the Machine Learning Group at the University of Cambri
 url:              "https://mlg-blog.com"
 baseurl:          ""
 github_usename:   mlg-blog
-google_analytics: G-XDEH4YH7WE
+google_analytics: G-216EYNZ435
 
 # Build settings
 highlighter: rouge
