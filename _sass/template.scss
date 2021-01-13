@@ -1,0 +1,150 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    color: $dark;
+    background: $verylight;
+}
+
+// Center stuff
+.centered {
+    max-width: calc(960px - 4em);
+    margin: 0 auto 0 auto;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
+// Header
+header {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    font-variant: small-caps;
+
+    background: url(../images/trinity.jpg);
+    background-position: center;
+    background-size: 1200px 560px;
+
+    // Spacing below
+    margin-bottom: 2em;
+
+    // Spacing between top of header and shaded area
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+
+    div.shaded {
+        background: rgba(0, 0, 0, 0.5);
+
+        // Spacing within shaded area
+        padding-top: 1.5em;
+        padding-bottom: 1.5em;
+
+        // Set minimum height.
+        min-height: 1em;
+
+        // Need to adapt `display` to ensure that the `div` automatically
+        // enlarges.
+        display: inline-block;
+        width: 100%;
+    }
+
+    // Logo
+    img {
+        height: 2em;
+        position: relative;
+        top: -.5em;
+        margin-right: .5em;
+    }
+
+    a {
+        font-size: 2em;
+        // line-height: 2.5em;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        &:hover { border-bottom: 5px solid $accent; }
+    }
+
+    // Menu
+    nav {
+        display: inline-block;
+        float: right;
+        a { margin-left: 0.5em; }
+    }
+}
+
+// Magic for sticky footer
+body, html { height: 100%; }
+#wrapper {
+    min-height: 100%;
+    position: relative;
+}
+main {
+    padding-bottom: calc(120px + 2em);
+    // Adapt to enlargement of footer.
+    @media screen and (max-width: 800px) {
+        padding-bottom: calc(160px + 2em);
+    }
+}
+
+// Footer
+footer {
+    position: absolute;
+    bottom: 0;
+    height: 120px;
+    width: 100%;
+    background: $dark;
+    color: white;
+
+    // If the screen becomes too small, enlarge footer.
+    @media screen and (max-width: 800px) {
+        height: 160px;
+    }
+
+    // Various sections
+    p {
+        margin-top: 1em;
+        margin-bottom: 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    // Vertically centre all sections
+    .centered {
+        position: relative;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+
+    a {
+        color: white;
+        text-decoration: underline;
+        &:hover {
+            color: $accent;
+        }
+    }
+
+    // Buttons
+    #feed-button, #twitter-button, #github-button {
+        width: 1em;
+        height: 1em;
+        margin-left: .1em;
+        padding-left: 1.25em;
+        background-size: 1em 1em;
+        background-position: 0 .1em;
+        background-repeat: no-repeat;
+    }
+    #feed-button {
+        background-image: url(../images/icons8-rss-white.png);
+        &:hover { background-image: url(../images/icons8-rss-blue.png); }
+    }
+    #twitter-button {
+        background-image: url(../images/icons8-twitter-white.png);
+        &:hover { background-image: url(../images/icons8-twitter-blue.png); }
+    }
+    #github-button {
+        background-image: url(../images/icons8-github-white.png);
+        &:hover { background-image: url(../images/icons8-github-blue.png); }
+    }
+}

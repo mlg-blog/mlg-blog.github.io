@@ -1,0 +1,73 @@
+---
+layout: default
+---
+<article>
+    {% if page.image -%}
+        <img src="{{ page.image | prepend:site.baseurl }}" class="representative-image" alt="Representative image">
+    {%- endif %}
+    <h1> {{ page.title }} </h1>
+    <p class="tags">
+        {% assign sorted_tags = page.tags | sort %}
+        {% for tag in sorted_tags %}
+            <a href="{{ site.baseurl }}/posts-by-tag#{{ tag | cgi_escape }}" class="tag">{{ tag }}</a>
+        {% endfor %}
+    </p>
+
+    By {% if page.authors.first.link -%}
+        <a href="{{ page.authors.first.link }}">{{ page.authors.first.name }}</a>
+    {%- else -%}
+        {{- page.authors.first.name -}}
+    {%- endif -%}
+    {%- assign first = true -%}
+    {%- for author in page.authors -%}
+        {%- if first -%}
+            {%- assign first = false -%}
+        {%- else -%}
+            , {% if author.link %}<a href="{{ author.link }}">{{ author.name }}</a>{% else %}{{ author.name }}{% endif %}
+        {%- endif -%}
+    {%- endfor %}
+
+    {{ content }}
+
+    {% if page.previous.url or page.next.url %}
+        <nav>
+            {% if page.previous.url %}
+                <div class="prev"><a href="{{ site.baseurl }}{{ page.previous.url }}">&laquo; {{ page.previous.title }}</a></div>
+            {% endif %}
+            {% if page.next.url %}
+                <div class="next"><a href="{{ site.baseurl }}{{ page.next.url }}">{{ page.next.title }} &raquo;</a></div>
+            {% endif %}
+        </nav>
+    {% endif %}
+
+    <date>
+        Published on {{ page.date | date: "%-d %B %Y" }}.
+        {% if page.date-edited %}
+            Last edited on {{ page.date-edited | date: "%-d %B %Y" }}.
+        {% endif %}
+    </date>
+
+    {% if page.comments %}
+        {% unless jekyll.environment == "production" %}
+            {% assign postfix = "/development" %}
+        {% endunless %}
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_config = function() {
+                this.page.url = '{{ site.url }}{{ site.baseurl }}{{ page.url }}{{ postfix }}';
+                this.page.identifier = '{{ page.id }}{{ postfix }}';
+            };
+            (function() {
+                var d = document;
+                s = d.createElement('script');
+                s.src = 'https://mlg-blog.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+                $('#enable-disqus-button').css('display', 'none');
+            })()
+        </script>
+        <noscript>
+            Please enable JavaScript to view the comments powered by <a href="https://disqus.com/?ref_noscript" rel="nofollow">Disqus.</a>
+        </noscript>
+    {% endif %}
+</article>

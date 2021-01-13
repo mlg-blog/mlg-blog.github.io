@@ -1,0 +1,120 @@
+main {
+    .tags {
+        // Make spacing look consistent.
+        margin-bottom: 1.5em;
+
+        // Tag itself
+        .tag {
+            background: $dark;
+            color: #fff;
+            height: 1.5em;
+            line-height: 1.5em;
+            padding: 0 .2em 0 .5em;
+            display: inline-block;
+            margin-top: .5em;
+            margin-right: 1.25em;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            position: relative;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        // Triangle
+        .tag:after {
+            content: '';
+            border-style: solid;
+            border-color: transparent transparent transparent $dark;
+            border-width: .75em 0 .75em .75em;
+            float: right;
+            position: absolute;
+            top: 0;
+            right: -.75em;
+            width: 0;
+            height: 0;
+        }
+
+        // Link
+        a.tag {
+            text-decoration: none;
+            &:hover { background: $light; color: $dark; }
+            &:hover:after { border-color: transparent transparent transparent $light; }
+        }
+
+        // Fine tuning spacing for posts by tag
+        &.posts-by-tag {
+            margin-top: -0.5em;
+            margin-bottom: -0.25em;
+        }
+    }
+
+    // List of posts
+    ul.posts {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        // A single post entry
+        li {
+            cursor: pointer;
+            background: white;
+            text-decoration: none;
+            color: $dark;
+            display: block;
+            padding: calc(1em - 2.5px);
+            border: 2.5px solid white;
+
+            // Hover effect
+            &:hover {
+                border: 2.5px solid $accent;
+            }
+
+            // Make sure that the bottom of the fourth line is not cut off.
+            line-height: 1.85em;
+
+            .representative-image {
+                display: inline-block;
+                width: 190px;
+                height: 190px;
+                float: left;
+                background-position: center;
+                background-size: cover;
+                margin-right: 1em;
+            }
+
+            // If an image is set, make sure that the content is large enough
+            // to accommodate the image.
+            .with-image {
+                min-height: 190px;
+            }
+
+            h2 {
+                margin-top: 0;
+                margin-bottom: .5em;
+
+                // If the screen becomes too small, move header to next line.
+                @media screen and (max-width: 500px) {
+                    width: 100%;
+                    display: inline-block;
+                    margin-top: .5em;
+                }
+
+                date {
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 0.8em;
+                    font-weight: normal;
+                    text-transform: none;
+                    float: right;
+                    color: $light;
+                    margin-left: 1em;
+                }
+            }
+
+            .authors {
+                margin-bottom: .5em;
+            }
+        }
+
+        // Spacing between subsequent entries
+        li+li { margin-top: 1em; }
+    }
+}

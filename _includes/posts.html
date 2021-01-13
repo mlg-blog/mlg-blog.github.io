@@ -1,0 +1,41 @@
+<ul class="posts">
+    {% for post in site.posts %}
+        <!-- Filter by tag if a tag is given. -->
+        {% if include.tag %}
+            {% unless post.tags contains include.tag %}
+                {% continue %}
+            {% endunless %}
+        {% endif %}
+        <li class="post" onclick="location.href='{{ post.url | prepend:site.baseurl }}';">
+                {% if post.image -%}
+                    <div style="background-image: url({{ post.image | prepend:site.baseurl }})" class="representative-image"> </div>
+                    <div class="content with-image">
+                {% else %}
+                    <div class="content">
+                {% endif %}
+                    <h2 class="no-link">
+                        <date> {{ post.date | date: "%-d %B %Y" }} </date>
+                        {{ post.title }}
+                    </h2>
+                    <div class="authors">
+                        <span class="authors-text">By</span>
+                        {% if post.authors.first.link -%}
+                            <a href="{{ post.authors.first.link }}">{{ post.authors.first.name }}</a>
+                        {%- else -%}
+                            {{- post.authors.first.name -}}
+                        {%- endif -%}
+                        {%- assign first = true -%}
+                        {%- for author in post.authors -%}
+                            {%- if first -%}
+                                {%- assign first = false -%}
+                            {%- else -%}
+                                , {% if author.link %}<a href="{{ author.link }}">{{ author.name }}</a>{% else %}{{ author.name }}{% endif %}
+                            {%- endif -%}
+                        {%- endfor %}
+                    </div>
+                    {{ post.excerpt }}
+                </div>
+            </a>
+        </li>
+    {% endfor %}
+</ul>

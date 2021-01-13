@@ -1,0 +1,20 @@
+title:            MLG Blog
+email:            wessel.p.bruinsma@gmail.com
+description:      Blog of the Machine Learning Group at the University of Cambridge
+url:              "https://mlg-blog.com"
+baseurl:          ""
+github_usename:   mlg-blog
+google_analytics: G-XDEH4YH7WE
+
+# Build settings
+highlighter: rouge
+markdown: kramdown
+plugins:
+    - jekyll-feed
+exclude:
+    - Gemfile
+    - Gemfile.lock
+    - LICENSE.txt
+    - README.md
+    - todo.tasks
+

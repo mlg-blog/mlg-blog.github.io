@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    {% include head.html %}
+    <body>
+        <!-- This input is here to make copying to clipboard work on iOS. -->
+        <input type="text" id="selection-dummy" style="display: none;" contenteditable="true" readonly="false">
+
+        <div id="wrapper">
+
+            <!-- Header and menu -->
+            <header>
+                <div class="shaded">
+                    <div class="centered">
+                        <img src="{{ site.baseurl }}/assets/images/cbl.png" alt="CBL" class="logo">
+                        <a href="{{ site.baseurl }}/" id="header-title">mlg blog</a>
+                        <nav id="menu">
+                            <a href="{{ site.baseurl }}/">home</a>
+                            <a href="{{ site.baseurl }}/posts-by-tag">tags</a>
+                            <a href="{{ site.baseurl }}/about">about</a>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <div class="centered">
+                <main>
+                    {{ content }}
+                </main>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="centered">
+                    <p class="links">
+                        Follow us on Twitter
+                            <a href="https://twitter.com/CambridgeMLG" id="twitter-button">@CambridgeMLG</a>
+                        and check our GitHub
+                            <a href="https://github.com/cambridge-mlg/" id="github-button">cambridge-mlg</a>.
+                    </p>
+                    <p class="closing">
+                        &copy; <a href="https://wesselb.github.io">wesselb.github.io</a>.
+                        Powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+                        Icons by <a href="https://icons8.com">Icons8</a>.
+                        <a href="{{ site.baseurl }}/feed.xml" id="feed-button">Feed</a>.
+                    </p>
+                </div>
+            </footer>
+
+        </div>
+
+        {% include body_end.html %}
+    </body>
+</html>
