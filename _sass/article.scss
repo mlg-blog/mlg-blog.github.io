@@ -33,8 +33,8 @@ main {
 
     // Increase spacing above each heading.
     h1 { margin-top: 0.2em; }
-    h2 { margin-top: 1.6em; }
-    h3 { margin-top: 0.5em; }
+    h2 { margin-top: 1.5em; }
+    h3 { margin-top: 1.0em; }
 
     article {
         background: white;
@@ -157,34 +157,6 @@ main {
         }
     }
 
-    // Code panes, colours from Solarized Light theme
-    .code-panes {
-        margin-bottom: calc(-2em + 2px);
-        margin-top: 2em;
-
-        // Pane buttons
-        a {
-            font-family: 'Roboto Condensed', sans-serif;
-            text-decoration: none;
-            color: $dark;
-            display: inline-block;
-            padding: 0 1em 0 1em;
-            background-color: #efefef;
-            border-top-right-radius: 5px;
-            border-top-left-radius: 5px;
-
-            // Spacing between buttons
-            &+a { margin-left: .5em; }
-
-            // Selection effect
-            &:hover, &.selected {
-                background-color: #fdf6e3;
-                cursor: pointer;
-                color: $dark;
-            }
-        }
-    }
-
     // Inline code
     code.highlighter-rouge {
         background: #efefef;
@@ -212,7 +184,7 @@ main {
 
     // Tables
     table {
-        margin: 2em auto 0 auto;
+        margin: 3em auto 0 auto;
         border-top: 2px solid black;
         border-bottom: 2px solid black;
 
