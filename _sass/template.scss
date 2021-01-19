@@ -47,10 +47,11 @@ header {
 
     // Logo
     img {
-        height: 2em;
+        height: 4em;
         position: relative;
-        top: -.5em;
+        top: .5em;
         margin-right: .5em;
+        margin-top: -2em;
     }
 
     a {
@@ -69,10 +70,6 @@ header {
         a { margin-left: 0.5em; }
     }
 }
-
-img.logo {height : 75px;}
-
-#menu {padding : 8px;}
 
 // Magic for sticky footer
 body, html { height: 100%; }
