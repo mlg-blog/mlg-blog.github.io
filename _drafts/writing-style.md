@@ -135,11 +135,11 @@ An example of an image is as follows:
     name="Figure 1"
     ref="draft"
     alt="Draft"
-    url="https://lh3.googleusercontent.com/proxy/AqPURYdtoNJirZJ9mUqtVZ2ki7UTr1X3GHQTg5jHynsPgEYYLmlC9MzREAKarm8nTi7MFvFb3_DNAABSHyelGaYXmqZr1nc4KeB2o5CT_A-xj1bCjA9LfzZm"
+    url="https://picsum.photos/500/300"
     width=500
 %}
 
-You can then reference this table with `[Figure 1](#figure-draft)`: [Figure 1](#figure-draft).
+You can then reference this figure with `[Figure 1](#figure-draft)`: [Figure 1](#figure-draft).
 Note that you must number the figures yourself.
 Moreover, note that the link to the figure is `figure-` plus the value given to `ref` in the include.
 References to figures should capitalised and not abbreviated.
