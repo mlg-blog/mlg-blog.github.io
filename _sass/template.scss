@@ -77,10 +77,10 @@ body, html { height: 100%; }
     position: relative;
 }
 main {
-    padding-bottom: calc(120px + 2em);
+    padding-bottom: calc(140px + 2em);
     // Adapt to enlargement of footer.
     @media screen and (max-width: 800px) {
-        padding-bottom: calc(160px + 2em);
+        padding-bottom: calc(180px + 2em);
     }
 }
 
@@ -88,14 +88,14 @@ main {
 footer {
     position: absolute;
     bottom: 0;
-    height: 120px;
+    height: 140px;
     width: 100%;
     background: $dark;
     color: white;
 
     // If the screen becomes too small, enlarge footer.
     @media screen and (max-width: 800px) {
-        height: 160px;
+        height: 180px;
     }
 
     // Various sections
