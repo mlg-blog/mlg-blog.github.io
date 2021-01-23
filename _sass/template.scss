@@ -29,6 +29,14 @@ header {
     padding-top: 1.5em;
     padding-bottom: 1.5em;
 
+    a {
+        font-size: 2em;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        &:hover { border-bottom: 5px solid $accent; }
+    }
+
     div.shaded {
         background: rgba(0, 0, 0, 0.5);
 
@@ -48,26 +56,43 @@ header {
     // Logo
     img {
         height: 4em;
+
+        // Inline positioning:
         position: relative;
         top: .5em;
         margin-right: .5em;
         margin-top: -2em;
     }
+    div#header-logo { display: inline; }
 
-    a {
-        font-size: 2em;
-        // line-height: 2.5em;
-        color: white;
-        text-decoration: none;
-        font-weight: bold;
-        &:hover { border-bottom: 5px solid $accent; }
-    }
 
     // Menu
     nav {
         display: inline-block;
         float: right;
         a { margin-left: 0.5em; }
+        a:first-child { margin-left: 0em; }
+    }
+
+    // Adapt to small screens.
+    @media screen and (max-width: 800px) {
+        text-align: center;
+
+        // Turn off inline positioning of logo.
+        img {
+            position: static;
+            top: 0em;
+            margin: 0em 0em 1em 0em;
+        }
+        div#header-logo {
+            display: block;
+        }
+
+        // Center navigation menu.
+        nav {
+            float: none;
+            width: 100%;
+        }
     }
 }
 
@@ -83,6 +108,9 @@ main {
     @media screen and (max-width: 800px) {
         padding-bottom: calc(180px + 2em);
     }
+    @media screen and (max-width: 600px) {
+        padding-bottom: calc(210px + 2em);
+    }
 }
 
 // Footer
@@ -97,6 +125,9 @@ footer {
     // If the screen becomes too small, enlarge footer.
     @media screen and (max-width: 800px) {
         height: 180px;
+    }
+    @media screen and (max-width: 600px) {
+        height: 210px;
     }
 
     // Various sections
