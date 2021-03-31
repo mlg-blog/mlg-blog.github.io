@@ -11,6 +11,9 @@ authors:
       link: https://link/to/personal/webpage
 comments:   true
 image:      /assets/images/trinity.jpg
+image_attribution:
+    name: Name Lastname
+    link: https://link/to/source
 ---
 
 The title is shown automatically.
