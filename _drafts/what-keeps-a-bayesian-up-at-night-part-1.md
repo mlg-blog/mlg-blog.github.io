@@ -59,7 +59,7 @@ This quantity is called the *Bayes risk*. We now pick the decision that we expec
 
 Why does a Bayesian represent their beliefs with probabilities[^4], reason according to the sum and product rule, and select actions which minimise the Bayes risk? We'll now review the most common theoretical arguments.
 
-**(1) de Finetti's exchangeability theorem** justifies the use of model parameters $\theta$, conditional distributions $p(D_n \cond \theta)$ over data given parameters (also called the *likelihood of parameters*), and critically *prior distributions over model parameters* $p(\theta)$. The theorem says that if you believe the order in which the data $D = (D_n)\_{n=1}^N$ arrives is unimportant --- $p(D)$ is invariant to the order of $(D_n)\_{n=1}^N$, an idea called *exchangeability* --- then there exists a random variable $\theta$ with associated prior distribution such that the data $D$ are i.i.d. given $\theta$ and your belief is recovered by marginalising over $\theta$:
+**(1) de Finetti's exchangeability theorem** justifies the use of model parameters $\theta$, conditional distributions $p(D_n \cond \theta)$ over data given parameters (also called the *likelihood of parameters*), and critically *prior distributions over parameters* $p(\theta)$ when specifying probabilistic models. The theorem says that if you believe the order in which the data $D = (D_n)\_{n=1}^N$ arrives is unimportant --- $p(D)$ is invariant to the order of $(D_n)\_{n=1}^N$, an idea called *exchangeability* --- then there exists a random variable $\theta$ with associated prior distribution such that the data $D$ are i.i.d. given $\theta$ and your belief is recovered by marginalising over $\theta$:
 
 \begin{equation}
     p(D) = \int p(\theta) \prod_{n=1}^N p(D_n | \theta) \,\mathrm{d}\theta.
@@ -85,9 +85,10 @@ Before we turn to them, you may have noticed that formulation of the probabilist
     q^*(X \cond D) = \argmin_{q} \E_{p(\theta,D)}[ \operatorname{KL}( p(X \cond \theta) \\| q(X \cond D)) ] = p(X \cond D).
 \end{equation}
 
-This argument tells us that the Bayesian predictions coming from the "right model" are KL-optimal on average. Interestingly, this result connects to recent ideas in meta-learning ([Gordon et al, 2019](https://arxiv.org/abs/1805.09921)).
+This argument tells us that the Bayesian predictions coming from the "right model" are KL-optimal on average. Interestingly, this result connects to recent ideas in meta-learning ([Gordon *et al.*, 2019](https://arxiv.org/abs/1805.09921)).
 
 **(7) Wald's theorem ([Wald, 1949](https://doi.org/10.1214/aoms/1177730030))** can be used to justify minimising an expected loss as a way of decision making. The theorem is concerned with *admissible* decision rules, which are rules that, for every other decision rule, achieve a better loss for at least *some* realisation of the unknown $X$. This condition is a very low bar: we'd hope that any reasonable decision rule would have this property. However, surprisingly, Wald's theorem says that essentially the *only* admissible decision rules are those derived from minimising the expected loss under some distribution ([Wald, 1949](https://doi.org/10.1214/aoms/1177730030); [Lehmann & Casella, 1998](https://doi.org/10.1007/b98854)).
+
 
 ## Conclusion
 
