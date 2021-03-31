@@ -101,6 +101,6 @@ It is striking that a number of arguments based on a diversity of desirable prop
 
 [^4]: That probabilities represent degrees of belief is only one interpretation of probability. For example, in *Probability, Statistics, and Truth* (Von Mises, 1928), von Mises argues that probability concerns limiting frequencies of repeating events. In this view and contrary to the Bayesian view, it is meaningless to talk about the probability of a one-off event: It is not possible to repeatedly sample that one-off event, which means that it doesn't have a limiting frequency.
 
-[^5]: "Consistency" also has another specific technical meaning in statistics, so we will use the term coherence in what follows.
+[^5]: Consistency also has another specific technical meaning in statistics, so we will use the term coherence in what follows.
 
 [^6]:  The axioms are reminiscent of those used in [Arrow's impossibility theorem](https://en.wikipedia.org/wiki/Arrow%27s_impossibility_theorem) concerning *fair* voting systems.
