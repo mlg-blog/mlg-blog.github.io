@@ -19,7 +19,7 @@ excerpt: |
 > --- *Leonard Jimmie Savage (1917--1971)*
 
 
-In the [first post](#) in this series, we laid out the standard arguments that we and many others have used to support the edifice which is Bayesian inference. In this post, we identify the weaknesses in these arguments that cause us to lose sleep at night.
+In the [first post]({% post_url 2021-03-31-what-keeps-a-bayesian-up-at-night-part-1 %}) in this series, we laid out the standard arguments that we and many others have used to support the edifice which is Bayesian inference. In this post, we identify the weaknesses in these arguments that cause us to lose sleep at night.
 
 We've split these weaknesses into three types: first, weaknesses in the standard mathematical justifications for the probabilistic approach; second, weaknesses arising in practice from the modelling stage; and, third, weaknesses arising from realising the inference stage due to computational constraints.
 
