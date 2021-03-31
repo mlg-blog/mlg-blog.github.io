@@ -1,6 +1,6 @@
 ---
 layout:      post
-title:       "What Keeps a Bayesian Up At Night? Part 2: Night Time"
+title:       "What Keeps a Bayesian Awake At Night? Part 2: Night Time"
 tags:        [theory, foundations]
 authors:
     - name: Wessel Bruinsma
