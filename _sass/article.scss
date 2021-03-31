@@ -59,6 +59,21 @@ main {
             max-width: 100%;
         }
     }
+    p.representative-image-attribution {
+        font-size: .7em;
+        padding: 0;
+        // Correct for font-size: 2 / 0.7 = 2.85.
+        margin: -2.85em 0 2.85em 0;
+        height: 1em;
+        text-align: center;
+        a {
+            color: #c0c0c0;
+            &:hover {
+                color: #c0c0c0;
+                text-decoration: underline;
+            }
+        }
+    }
 
     // Date at the bottom
     article>date {

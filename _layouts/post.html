@@ -4,6 +4,11 @@ layout: default
 <article>
     {% if page.image -%}
         <img src="{{ page.image | prepend:site.baseurl }}" class="representative-image" alt="Representative image">
+        {% if page.image_attribution -%}
+            <p class="representative-image-attribution">
+                <a href="{{ page.image_attribution.link }}">Image by {{ page.image_attribution.name }}.</a>
+            </p>
+        {%- endif %}
     {%- endif %}
     <h1> {{ page.title }} </h1>
     <p class="tags">
