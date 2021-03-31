@@ -4,6 +4,10 @@ main {
     text-align: left;
 
     // Links
+    mjx-container[jax="SVG"] > svg a {
+        fill: $accent;
+        stroke: $accent;
+    }
     a {
         color: $accent;
         text-decoration: none;
