@@ -47,18 +47,14 @@ main {
 
     // Image at the top
     article>img.representative-image {
-        max-height: 300px;
-        max-width: 600px;
-        height: auto;
-        width: auto;
         display: block;
+        object-fit: contain;
+        height: auto;
+        max-height: 300px;
+        width: 100%;
         margin: 0 auto 2em auto;
-
-        // The `7em` lets it resize just as it will not fit anymore.
-        @media screen and (max-width: calc(600px + 7em)) {
-            max-width: 100%;
-        }
     }
+
     p.representative-image-attribution {
         font-size: .7em;
         padding: 0;
