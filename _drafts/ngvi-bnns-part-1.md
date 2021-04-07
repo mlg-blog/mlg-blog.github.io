@@ -10,6 +10,8 @@ image:      /assets/images/ngvi-bnns/representative-image.png
 image_attribution: 
     name: Khan & Nielsen (2018)
     link: https://arxiv.org/pdf/1807.04489.pdf
+excerpt: |
+    What does it mean to combine variational inference with natural gradients? Can this scale to neural networks? What kind of approximations do we need to make? We take a detailed look at the mathematical derivations of such algorithms.
 ---
 
 Bayesian Deep Learning hopes to tackle neural networks' poorly-calibrated uncertainties by injecting some level of Bayesian thinking.
@@ -53,10 +55,10 @@ Although there are many approximate Bayesian inference algorithms, we will only 
 Separately, natural-gradient update steps were introduced as a principled way of incorporating the information geometry of the distribution being optimised ([Amari, 1998](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.452.7280&rep=rep1&type=pdf)).
 By incorporating the geometry of the distribution, we expect to take gradient steps in much better directions.
 This should speed up gradient optimisation significantly.
-For a more detailed explanation, please look at the motivation in papers such as [Khan & Nielsen (2018)](https://arxiv.org/pdf/1807.04489.pdf) or [Martens (2020)](https://jmlr.org/papers/volume21/17-678/17-678.pdf). I found figures such as Figure 1(a) from [Khan & Nielsen (2018)](https://arxiv.org/pdf/1807.04489.pdf) particularly useful.
+For a more detailed explanation, please look at the motivation in papers such as [Khan & Nielsen (2018)](https://arxiv.org/pdf/1807.04489.pdf) or [Martens (2020)](https://jmlr.org/papers/volume21/17-678/17-678.pdf); I found figures such as Figure 1(a) from [Khan & Nielsen (2018)](https://arxiv.org/pdf/1807.04489.pdf) particularly useful.
 
 It therefore makes sense to try and apply natural-gradient updates to VI for NNs, where speed of convergence has been an issue.
-In this blog post, we will do this while looking closely at the mathematical details.
+In this blog post, we do this while looking closely at the mathematical details.
 We will follow the appendices in [Khan et al. (2018)](https://arxiv.org/pdf/1806.04854.pdf).
 I also hope that, after reading this blog, you will be able to confidently approach recent papers that use NGVI, papers which often assume some knowledge of how NGVI algorithms are derived.
 
@@ -82,14 +84,14 @@ where $\vphi(\vparam)$ is the vector of sufficient statistics, $\langle \cdot,\c
 In Bayesian inference, we want to learn the posterior distribution over parameters after observing some data $\data$. The posterior is given as,
 
 \begin{equation}
-   p(\vparam \cond \data) = \frac{ {\color{purple}p(\data\cond\vparam)} {\color{blue}p_0(\vparam)}}{p(\data)},
+   p(\vparam \cond \data) = \frac{ {\color{purple}p(\data\cond\vparam)} {\color{blue}p_0(\vparam)}}{p(\data)}, \nonumber
 \end{equation}
 
 where ${\color{purple}p(\data\pipe \vparam)}$ is the data likelihood and ${\color{blue}p_0(\vparam)}$ is the prior over parameters. We will use colours to keep track of terms coming from the likelihood and prior.
-Note that in supervised learning where the dataset $\data$ consists of inputs $\mathbf{X}$ and labels $\mathbf{y}$, we should really write the likelihood as ${\color{purple}p(\mathbf{y}\pipe \mathbf{X}, \vparam)}$, but we slightly abuse notation by writing ${\color{purple}p(\data\pipe \vparam)}$.
+Note that in supervised learning, where the dataset $\data$ consists of inputs $\mathbf{X}$ and labels $\mathbf{y}$, we should write the likelihood as ${\color{purple}p(\mathbf{y}\pipe \mathbf{X}, \vparam)}$, but we slightly abuse notation by writing ${\color{purple}p(\data\pipe \vparam)}$.
 
-If our likelihood and prior are set correctly, then exact Bayesian inference is optimal.
-But unfortunately there are problems in reality: (i) we are usually unsure if the likelihood or prior is correct, and (ii) exact Bayesian inference is often not possible, especially in NNs. In this blog post, we only focus on approaches to problem (ii): algorithms for approximate Bayesian inference. We do not consider problem (i).
+If our likelihood and prior are set correctly, then exact Bayesian inference is optimal, but unfortunately there are problems in reality (this statement comes with many caveats! See e.g. [this blog post](https://mlg-blog.com/2021/03/31/what-keeps-a-bayesian-awake-at-night-part-1.html) for a more detailed discussion).
+To name two problems, (i) we are usually unsure if the likelihood or prior is correct, and (ii) exact Bayesian inference is often not possible, especially in NNs. In this blog post, we only focus on approaches to problem (ii): algorithms for approximate Bayesian inference. We do not consider problem (i). 
 
 Variational Bayesian inference approximates exact Bayesian inference by learning the parameters of a distribution $q(\vparam)$ that best approximates the true posterior distribution $p(\vparam \pipe \data)$. We do this by maximising the Evidence Lower Bound (ELBO), which is equivalent to minimising the KL divergence between the approximate distribution and the true posterior.
 By assuming that $q(\vparam)$ is an exponential family distribution $q_\veta(\vparam)$, we can write the ELBO as follows,
@@ -134,18 +136,18 @@ We wish to combine variational inference with natural-gradient updates, so let's
 
 \begin{align}
    \nabla\_\vm \,\text{KL term}
-   &= \nabla\_\mathbf{m} \mathbb{E}\_{q\_\eta(\boldsymbol{\theta})} \left[ \boldsymbol{\phi}(\boldsymbol{\theta})^\top ({\color{blue}\veta\_0} - \veta) + A(\veta) + \text{const} \right] \newline
-   &= \nabla\_\mathbf{m} \left[ \mathbf{m}^\top ({\color{blue}\veta\_0} - \veta) \right] + \nabla\_\mathbf{m} A(\veta) \newline
-   &= {\color{blue}\veta\_0} - \veta - \left[ \nabla\_\mathbf{m}\veta \right]^\top \mathbf{m} + \nabla\_\mathbf{m} A(\veta)  \newline
-   &= {\color{blue}\veta\_0} - \veta - \mathbf{F}(\veta)^{-1}\mathbf{m} + \mathbf{F}(\veta)^{-1}\mathbf{m}  \newline
-   &= {\color{blue}\veta\_0} - \veta.
+   &= \nabla\_\mathbf{m} \mathbb{E}\_{q\_\eta(\boldsymbol{\theta})} \left[ \boldsymbol{\phi}(\boldsymbol{\theta})^\top ({\color{blue}\veta\_0} - \veta) + A(\veta) + \text{const} \right] \nonumber\newline
+   &= \nabla\_\mathbf{m} \left[ \mathbf{m}^\top ({\color{blue}\veta\_0} - \veta) \right] + \nabla\_\mathbf{m} A(\veta) \nonumber\newline
+   &= {\color{blue}\veta\_0} - \veta - \left[ \nabla\_\mathbf{m}\veta \right]^\top \mathbf{m} + \nabla\_\mathbf{m} A(\veta)  \nonumber\newline
+   &= {\color{blue}\veta\_0} - \veta - \mathbf{F}(\veta)^{-1}\mathbf{m} + \mathbf{F}(\veta)^{-1}\mathbf{m}  \nonumber\newline
+   &= {\color{blue}\veta\_0} - \veta. \nonumber
 \end{align}
 
-The third line follows using the product rule, and the fourth line uses $\nabla_\mathbf{m}(\cdot) = \mathbf{F}(\veta)^{-1} \nabla_\veta(\cdot)$ from Equation \eqref{eq:mean-natural gradient} and the fact that the Fisher information matrix is symmetric.
+The third line follows using the product rule, and the fourth line uses $\nabla_\mathbf{m}(\cdot) = \mathbf{F}(\veta)^{-1} \nabla_\veta(\cdot)$ from Equation \eqref{eq:mean-natural gradient} and the symmetry of the Fisher information matrix.
 Plugging the ELBO (with this simplification) into Equation \eqref{eq:NGD},
 
 \begin{align}
-  \veta_{t+1} &= \veta_t + \beta_t \left( \nabla_\vm \myexpect_{q_{\veta_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right] + ({\color{blue}\veta_0} - \veta_t) \right) \newline
+  \veta_{t+1} &= \veta_t + \beta_t \left( \nabla_\vm \myexpect_{q_{\veta_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right] + ({\color{blue}\veta_0} - \veta_t) \right) \nonumber\newline
    \label{eq:BLR}
    \therefore \veta_{t+1} &= (1-\beta_t) \veta_t + \beta_t \Big({\color{blue}\veta_0} + \nabla_\vm \underbrace{\myexpect_{q_{\veta_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right]}\_{ {\color{purple}\Large\mathcal{F}\_t}} \Big).
 \end{align}
@@ -161,9 +163,9 @@ The minimal representation for a Gaussian family has two components to its natur
 
 \begin{align}
    \veta^{(1)} &= \vSigma^{-1}\vmu,
-   & \veta^{(2)} &= -\frac{1}{2}\vSigma^{-1}, \newline
+   & \veta^{(2)} &= -\frac{1}{2}\vSigma^{-1}, \nonumber\newline
    \vm^{(1)} &= \vmu,
-   & \vm^{(2)} &= \vmu\vmu^\top + \vSigma.
+   & \vm^{(2)} &= \vmu\vmu^\top + \vSigma. \nonumber
 \end{align}
 
 Let the prior be a zero-mean Gaussian, ${\color{blue}p_0(\vparam) = \gauss(\vparam; \boldsymbol{0}, \delta^{-1}\vI)}$. We can therefore write the prior natural parameters as ${\color{blue}\veta_0^{(1)} = \boldsymbol{0}, \veta_0^{(2)} = -\frac{1}{2}\delta\vI}$.
@@ -171,12 +173,12 @@ Let the prior be a zero-mean Gaussian, ${\color{blue}p_0(\vparam) = \gauss(\vpar
 We now simplify $\nabla_\vm {\color{purple}\mathcal{F}_t}$ to be in terms of $\vmu$ and $\vSigma$ instead of $\vm$. We can use the chain rule to do this (see e.g. [Opper & Archambeau (2009)](http://www0.cs.ucl.ac.uk/staff/c.archambeau/publ/neco_mo09_web.pdf) or Appendix B.1 in [Khan & Lin, 2017](https://arxiv.org/pdf/1703.04265.pdf)),
 
 \begin{align}
-   \nabla_{\vm^{(1)}}{\color{purple}\mathcal{F}\_t} &= \nabla_\vmu {\color{purple}\mathcal{F}\_t} - 2[\nabla_\vSigma {\color{purple}\mathcal{F}\_t}] \vmu, \newline
-   \nabla_{\vm^{(2)}}{\color{purple}\mathcal{F}\_t} &= \nabla_\vSigma {\color{purple}\mathcal{F}\_t}.
+   \nabla_{\vm^{(1)}}{\color{purple}\mathcal{F}\_t} &= \nabla_\vmu {\color{purple}\mathcal{F}\_t} - 2[\nabla_\vSigma {\color{purple}\mathcal{F}\_t}] \vmu, \nonumber\newline
+   \nabla_{\vm^{(2)}}{\color{purple}\mathcal{F}\_t} &= \nabla_\vSigma {\color{purple}\mathcal{F}\_t}. \nonumber
 \end{align}
 
-We would like to write out the natural-gradient updates (Equation \eqref{eq:BLR}) for the first and second natural parameters of the Gaussian, with the resulting equations in terms of the prior natural parameters ${\color{blue}\veta_0}$ and the data ${\color{purple}\mathcal{F}_t}$.
-So let's substitute the above derivations into Equation \eqref{eq:BLR}. Let's start with the second element, $\veta^{(2)}$, to give us an update for $\vSigma^{-1}$,
+We would like to write out the natural-gradient updates (Equation \eqref{eq:BLR}) for the parameters of a Gaussian, with the resulting equations in terms of the prior natural parameters ${\color{blue}\veta_0}$ and the data ${\color{purple}\mathcal{F}_t}$.
+So let's substitute the above derivations into Equation \eqref{eq:BLR}. We start with the second element, $\veta^{(2)}$, giving us an update for $\vSigma^{-1}$,
 
 \begin{equation} \label{eq:Gaussian_Sigma}
    \vSigma_{t+1}^{-1} = (1-\beta_t)\vSigma_t^{-1} + \beta_t ({\color{blue}\delta\vI} - 2\nabla_\vSigma {\color{purple}\mathcal{F}_t}).
@@ -185,8 +187,8 @@ So let's substitute the above derivations into Equation \eqref{eq:BLR}. Let's st
 We also obtain an update for the mean $\vmu$ by looking at the first element $\veta^{(1)}$,
 
 \begin{align}
-   \vSigma\_{t+1}^{-1} \vmu\_{t+1} &= (1-\beta\_t)\vSigma\_{t}^{-1} \vmu\_{t} + \beta\_t ({\color{blue}\boldsymbol{0}} + \nabla\_\vmu {\color{purple}\mathcal{F}\_t} - 2 [\nabla\_\vSigma {\color{purple}\mathcal{F}\_t}] \vmu\_t) \newline
-   &= \underbrace{\left[ (1-\beta\_t)\vSigma\_t^{-1} + \beta\_t ({\color{blue}\delta\vI} - 2\nabla\_\vSigma {\color{purple}\mathcal{F}\_t}) \right]}\_{=\vSigma\_{t+1}^{-1}\text{, by Equation \eqref{eq:Gaussian\_Sigma}}} \vmu\_t + \beta\_t (\nabla\_\vmu {\color{purple}\mathcal{F}\_t} - {\color{blue}\delta} \vmu\_t) \newline
+   \vSigma\_{t+1}^{-1} \vmu\_{t+1} &= (1-\beta\_t)\vSigma\_{t}^{-1} \vmu\_{t} + \beta\_t ({\color{blue}\boldsymbol{0}} + \nabla\_\vmu {\color{purple}\mathcal{F}\_t} - 2 [\nabla\_\vSigma {\color{purple}\mathcal{F}\_t}] \vmu\_t) \nonumber\newline
+   &= \underbrace{\left[ (1-\beta\_t)\vSigma\_t^{-1} + \beta\_t ({\color{blue}\delta\vI} - 2\nabla\_\vSigma {\color{purple}\mathcal{F}\_t}) \right]}\_{=\vSigma\_{t+1}^{-1}\text{, by Equation \eqref{eq:Gaussian\_Sigma}}} \vmu\_t + \beta\_t (\nabla\_\vmu {\color{purple}\mathcal{F}\_t} - {\color{blue}\delta} \vmu\_t) \nonumber\newline
    \label{eq:Gaussian_mu}
    \therefore \vmu\_{t+1} &= \vmu\_t + \beta\_t \vSigma\_{t+1} (\nabla\_\vmu {\color{purple}\mathcal{F}\_t} - {\color{blue}\delta} \vmu\_t).
 \end{align}
@@ -203,9 +205,9 @@ Fortunately, we can express these in terms of the gradient and Hessian of the ne
 
 \begin{align}
    \label{eq:bonnet_gradient}
-   \nabla\_\vmu {\color{purple}\mathcal{F}\_t} &= \nabla\_\vmu \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right] = \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla\_\vparam \log {\color{purple}p(\data\pipe\vparam)}\right] = -\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N{\color{purple}\vg(\vparam)} \right], \newline
+   \nabla\_\vmu {\color{purple}\mathcal{F}\_t} &= \nabla\_\vmu \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right]& &= \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla\_\vparam \log {\color{purple}p(\data\pipe\vparam)}\right]& &= -\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N{\color{purple}\vg(\vparam)} \right], \newline
    \label{eq:bonnet_hessian}
-   \nabla\_\vSigma {\color{purple}\mathcal{F}\_t} &= \nabla\_\vSigma \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right] = \frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla^2\_{\vparam\vparam} \log {\color{purple}p(\data\pipe\vparam)}\right] = -\frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N{\color{purple}\vH(\vparam)} \right],
+   \nabla\_\vSigma {\color{purple}\mathcal{F}\_t} &= \nabla\_\vSigma \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right]& &= \frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla^2\_{\vparam\vparam} \log {\color{purple}p(\data\pipe\vparam)}\right]& &= -\frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N{\color{purple}\vH(\vparam)} \right],
 \end{align}
 
 where we have used the average per-example gradient ${\color{purple}\vg(\vparam)}$ and Hessian ${\color{purple}\vH(\vparam)}$ of the negative log-likelihood (the dataset has $N$ examples).
