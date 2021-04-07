@@ -35,8 +35,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 ## Equations
 
-You can render inline math by using double dollar signs.
-For example, `$$f(x) = x^2$$` renders as $$f(x) = x^2$$.
+You can render inline math by using single dollar signs.
+For example, `$f(x) = x^2$` renders as $f(x) = x^2$.
 Display math can be rendered by writing a LaTeX environment.
 For example,
 
