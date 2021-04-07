@@ -7,6 +7,9 @@ authors:
      link: https://siddharthswaroop.github.io/
 comments:   true
 image:      /assets/images/ngvi-bnns/representative-image.png
+image_attribution: 
+    name: Khan & Nielsen (2018)
+    link: https://arxiv.org/pdf/1807.04489.pdf
 ---
 
 Bayesian Deep Learning hopes to tackle neural networks' poorly-calibrated uncertainties by injecting some level of Bayesian thinking.
@@ -35,7 +38,7 @@ $\newcommand{\vg}{\mathbf{g}}$
 $\newcommand{\vH}{\mathbf{H}}$
 $\newcommand{\vs}{\mathbf{s}}$
 $\newcommand{\myexpect}{\mathbb{E}}$
-$\newcommand{\pipe}{|}$
+$\newcommand{\pipe}{\,|\,}$
 $\newcommand{\data}{\mathcal{D}}$
 $\newcommand{\loss}{\mathcal{L}}$
 $\newcommand{\gauss}{\mathcal{N}}$
@@ -79,7 +82,7 @@ where $\vphi(\vparam)$ is the vector of sufficient statistics, $\langle \cdot,\c
 In Bayesian inference, we want to learn the posterior distribution over parameters after observing some data $\data$. The posterior is given as,
 
 \begin{equation}
-   p(\vparam | \data) = \frac{ \color{purple}{p(\data|\vparam)} \color{blue}{p_0(\vparam)}}{p(\data)},
+   p(\vparam \cond \data) = \frac{ \color{purple}{p(\data\cond\vparam)} \color{blue}{p_0(\vparam)}}{p(\data)},
 \end{equation}
 
 where $\color{purple}{p(\data\pipe \vparam)}$ is the data likelihood and $\color{blue}{p_0(\vparam)}$ is the prior over parameters. We will use colours to keep track of terms coming from the likelihood and prior.
@@ -92,7 +95,7 @@ Variational Bayesian inference approximates exact Bayesian inference by learning
 By assuming that $q(\vparam)$ is an exponential family distribution $q_\veta(\vparam)$, we can write the ELBO as follows,
 
 \begin{equation} \label{eq:ELBO}
-   \loss_\mathrm{ELBO}(\veta) = \underbrace{\myexpect_{q_\veta(\vparam)} \left[\log \color{purple}{p(\data|\vparam)}\right]}\_\text{Likelihood term} + \underbrace{\myexpect_{q_\veta(\vparam)} \left[\log \frac{\color{blue}{p_0(\vparam)}}{q_\veta(\vparam)} \right]}\_\text{KL (to prior) term},
+   \loss_\mathrm{ELBO}(\veta) = \underbrace{\myexpect_{q_\veta(\vparam)} \left[\log \color{purple}{p(\data\pipe\vparam)}\right]}\_\text{Likelihood term} + \underbrace{\myexpect_{q_\veta(\vparam)} \left[\log \frac{\color{blue}{p_0(\vparam)}}{q_\veta(\vparam)} \right]}\_\text{KL (to prior) term},
 \end{equation}
 
 which we optimise with respect to $\veta$. There are many good references on variational inference, such as [Blei et al. (2018)](https://arxiv.org/pdf/1601.00670.pdf) or [Zhang et al. (2018)](https://arxiv.org/pdf/1711.05597.pdf).
@@ -127,58 +130,53 @@ Plugging this in, we get our simplified natural-gradient update step,
 
 ## The details: Natural-gradient VI
 
-We wish to combine variational inference with natural-gradient updates, so let's get straight into it: we plug the ELBO (Equation \ref{eq:ELBO}) into the natural-gradient update (Equation \ref{eq:NGD}). Let the prior $\color{blue}{p_0(\vparam)}$ be an exponential family with natural parameters $\color{blue}{\veta_0}$. We first note that the KL term in the ELBO can be simplified as we are dealing with exponential families,
+We wish to combine variational inference with natural-gradient updates, so let's get straight into it: we plug the ELBO (Equation \eqref{eq:ELBO}) into the natural-gradient update (Equation \eqref{eq:NGD}). Let the prior $\color{blue}{p_0(\vparam)}$ be an exponential family with natural parameters $\color{blue}{\veta_0}$. We first note that the KL term in the ELBO can be simplified as we are dealing with exponential families,
 
 \begin{align}
    \nabla\_\vm \,\text{KL term}
-   &= \nabla\_\mathbf{m} \mathbb{E}\_{q\_\eta(\boldsymbol{\theta})} \left[ \boldsymbol{\phi}(\boldsymbol{\theta})^\top (\color{blue}{\veta\_0} - \veta) + A(\veta) + \text{const} \right] \nonumber \newline
+   &= \nabla\_\mathbf{m} \mathbb{E}\_{q\_\eta(\boldsymbol{\theta})} \left[ \boldsymbol{\phi}(\boldsymbol{\theta})^\top (\color{blue}{\veta\_0} - \veta) + A(\veta) + \text{const} \right] \newline
    &= \nabla\_\mathbf{m} \left[ \mathbf{m}^\top (\color{blue}{\veta\_0} - \veta) \right] + \nabla\_\mathbf{m} A(\veta) \newline
    &= \color{blue}{\veta\_0} - \veta - \left[ \nabla\_\mathbf{m}\veta \right]^\top \mathbf{m} + \nabla\_\mathbf{m} A(\veta)  \newline
    &= \color{blue}{\veta\_0} - \veta - \mathbf{F}(\veta)^{-1}\mathbf{m} + \mathbf{F}(\veta)^{-1}\mathbf{m}  \newline
    &= \color{blue}{\veta\_0} - \veta.
 \end{align}
 
-The third line follows using the product rule, and the fourth line uses $\nabla_\mathbf{m}(\cdot) = \mathbf{F}(\veta)^{-1} \nabla_\veta(\cdot)$ from Equation \ref{eq:mean-natural gradient} and the fact that the Fisher information matrix is symmetric.
-Plugging the ELBO (with this simplification) into Equation \ref{eq:NGD},
+The third line follows using the product rule, and the fourth line uses $\nabla_\mathbf{m}(\cdot) = \mathbf{F}(\veta)^{-1} \nabla_\veta(\cdot)$ from Equation \eqref{eq:mean-natural gradient} and the fact that the Fisher information matrix is symmetric.
+Plugging the ELBO (with this simplification) into Equation \eqref{eq:NGD},
 
-\begin{equation}
-   \hspace{1em}\veta_{t+1} = \veta_t + \beta_t \left( \nabla_\vm \myexpect_{q_{\veta_t}(\vparam)} \left[\log \color{purple}{p(\data|\vparam)}\right] + (\color{blue}{\veta_0} - \veta_t) \right) \nonumber
-\end{equation}
-
-\begin{equation} \label{eq:BLR}
-   \hspace{1em}\therefore \veta_{t+1} = (1-\beta_t) \veta_t + \beta_t \Big(\color{blue}{\veta_0} + \nabla_\vm \underbrace{\myexpect_{q_{\veta_t}(\vparam)} \left[\log \color{purple}{p(\data|\vparam)}\right]}_{\color{purple}{\Large\mathcal{F}_t}} \Big).
-\end{equation}
+\begin{align}
+   \hspace{1em}\veta_{t+1} &= \veta_t + \beta_t \left( \nabla_\vm \myexpect_{q_{\veta_t}(\vparam)} \left[\log \color{purple}{p(\data\pipe\vparam)}\right] + (\color{blue}{\veta_0} - \veta_t) \right) \newline
+   \label{eq:BLR}
+   \therefore \veta_{t+1} &= (1-\beta_t) \veta_t + \beta_t \Big(\color{blue}{\veta_0} + \nabla_\vm \underbrace{\myexpect_{q_{\veta_t}(\vparam)} \left[\log \color{purple}{p(\data\pipe\vparam)}\right]}_{\color{purple}{\Large\mathcal{F}_t}} \Big).
+\end{align}
 
 This equation is presented and analysed in detail in [Khan & Rue (2020)](https://emtiyaz.github.io/papers/learning_from_bayes.pdf), where it is called the 'Bayesian learning rule'.
 I recommend reading the paper if you are interested in this and related topics: they show how this equation appears in many different scenarios (beyond just the Bayesian derivation presented above), and also consider extensions beyond what we consider in this blog post. This allows them to connect to a plethora of different learning algorithms ranging from Newton's method to Kalman filters to Adam.
-<!--
-I recommend reading the paper if you are more interested in this and related topics: they provide many key insights, consider extensions beyond what we consider here, and connect to a plethora of different learning algorithms ranging from Newton's method to Kalman filters to Adam.
--->
 
 ### Gaussian approximating family
 
 We now consider a Gaussian approximating family, $q_\veta(\vparam) = \gauss(\vparam; \vmu, \vSigma)$.
-We will substitute the Gaussian's natural parameters into Equation \ref{eq:BLR} to obtain updates for $\vmu$ and $\vSigma$.
+We will substitute the Gaussian's natural parameters into Equation \eqref{eq:BLR} to obtain updates for $\vmu$ and $\vSigma$.
 The minimal representation for a Gaussian family has two components to its natural parameters and mean parameters,
 
-\begin{equation}
-   \veta^{(1)} = \vSigma^{-1}\vmu, \hspace{2em}\veta^{(2)} = -\frac{1}{2}\vSigma^{-1}, \hspace{2em} \nonumber
-\end{equation}
-\begin{equation}
-   \vm^{(1)} = \vmu, \hspace{2em}\vm^{(2)} = \vmu\vmu^\top + \vSigma. \nonumber
-\end{equation}
+\begin{align}
+   \veta^{(1)} &= \vSigma^{-1}\vmu,
+   & \veta^{(2)} &= -\frac{1}{2}\vSigma^{-1}, \newline
+   \vm^{(1)} &= \vmu,
+   & \vm^{(2)} &= \vmu\vmu^\top + \vSigma.
+\end{align}
 
 Let the prior be a zero-mean Gaussian, $\color{blue}{p_0(\vparam) = \gauss(\vparam; \boldsymbol{0}, \delta^{-1}\vI)}$. We can therefore write the prior natural parameters as $\color{blue}{\veta_0^{(1)} = \boldsymbol{0}, \veta_0^{(2)} = -\frac{1}{2}\delta\vI}$.
 
 We now simplify $\nabla_\vm \color{purple}{\mathcal{F}_t}$ to be in terms of $\vmu$ and $\vSigma$ instead of $\vm$. We can use the chain rule to do this (see e.g. [Opper & Archambeau (2009)](http://www0.cs.ucl.ac.uk/staff/c.archambeau/publ/neco_mo09_web.pdf) or Appendix B.1 in [Khan & Lin, 2017](https://arxiv.org/pdf/1703.04265.pdf)),
 
-\begin{equation}
-   \hspace{5.3em}\nabla_{\vm^{(1)}}\mathcal{F} = \nabla_\vmu \mathcal{F} - 2[\nabla_\vSigma \mathcal{F}] \vmu, \nonumber \newline
-   \nabla_{\vm^{(2)}}\mathcal{F} = \nabla_\vSigma \mathcal{F}.
-\end{equation}
+\begin{align}
+   \nabla_{\vm^{(1)}}\mathcal{F} &= \nabla_\vmu \mathcal{F} - 2[\nabla_\vSigma \mathcal{F}] \vmu, \newline
+   \nabla_{\vm^{(2)}}\mathcal{F} &= \nabla_\vSigma \mathcal{F}.
+\end{align}
 
-We would like to write out the natural-gradient updates (Equation \ref{eq:BLR}) for the first and second natural parameters of the Gaussian, with the resulting equations in terms of the prior natural parameters $\color{blue}{\veta_0}$ and the data $\color{purple}{\mathcal{F}_t}$.
-So let's substitute the above derivations into Equation \ref{eq:BLR}. Let's start with the second element, $\veta^{(2)}$, to give us an update for $\vSigma^{-1}$,
+We would like to write out the natural-gradient updates (Equation \eqref{eq:BLR}) for the first and second natural parameters of the Gaussian, with the resulting equations in terms of the prior natural parameters $\color{blue}{\veta_0}$ and the data $\color{purple}{\mathcal{F}_t}$.
+So let's substitute the above derivations into Equation \eqref{eq:BLR}. Let's start with the second element, $\veta^{(2)}$, to give us an update for $\vSigma^{-1}$,
 
 \begin{equation} \label{eq:Gaussian_Sigma}
    \vSigma_{t+1}^{-1} = (1-\beta_t)\vSigma_t^{-1} + \beta_t (\color{blue}{\delta\vI} - 2\nabla_\vSigma \color{purple}{\mathcal{F}_t}).
@@ -187,16 +185,14 @@ So let's substitute the above derivations into Equation \ref{eq:BLR}. Let's star
 We also obtain an update for the mean $\vmu$ by looking at the first element $\veta^{(1)}$,
 
 \begin{align}
-   \vSigma\_{t+1}^{-1} \vmu\_{t+1} &= (1-\beta\_t)\vSigma\_{t}^{-1} \vmu\_{t} + \beta\_t (\color{blue}{\boldsymbol{0}} + \nabla\_\vmu \color{purple}{\mathcal{F}\_t} - 2 [\nabla\_\vSigma \color{purple}{\mathcal{F}\_t}] \vmu\_t) \nonumber \newline
-   &= \underbrace{\left[ (1-\beta\_t)\vSigma\_t^{-1} + \beta\_t (\color{blue}{\delta\vI} - 2\nabla\_\vSigma \color{purple}{\mathcal{F}\_t}) \right]}\_{=\vSigma\_{t+1}^{-1}\text{, by Equation \ref{eq:Gaussian\_Sigma}}} \vmu\_t + \beta\_t (\nabla\_\vmu \color{purple}{\mathcal{F}\_t} - \color{blue}{\delta} \vmu\_t)
+   \vSigma\_{t+1}^{-1} \vmu\_{t+1} &= (1-\beta\_t)\vSigma\_{t}^{-1} \vmu\_{t} + \beta\_t (\color{blue}{\boldsymbol{0}} + \nabla\_\vmu \color{purple}{\mathcal{F}\_t} - 2 [\nabla\_\vSigma \color{purple}{\mathcal{F}\_t}] \vmu\_t) \newline
+   &= \underbrace{\left[ (1-\beta\_t)\vSigma\_t^{-1} + \beta\_t (\color{blue}{\delta\vI} - 2\nabla\_\vSigma \color{purple}{\mathcal{F}\_t}) \right]}\_{=\vSigma\_{t+1}^{-1}\text{, by Equation \eqref{eq:Gaussian\_Sigma}}} \vmu\_t + \beta\_t (\nabla\_\vmu \color{purple}{\mathcal{F}\_t} - \color{blue}{\delta} \vmu\_t) \newline
+   \label{eq:Gaussian_mu}
+   \therefore \vmu\_{t+1} &= \vmu\_t + \beta\_t \vSigma\_{t+1} (\nabla\_\vmu \color{purple}{\mathcal{F}\_t} - \color{blue}{\delta} \vmu\_t).
 \end{align}
 
-\begin{equation} \label{eq:Gaussian_mu}
-   \therefore \vmu\_{t+1} = \vmu\_t + \beta\_t \vSigma\_{t+1} (\nabla\_\vmu \color{purple}{\mathcal{F}\_t} - \color{blue}{\delta} \vmu\_t).\hspace{7em}
-\end{equation}
-
-The update for the precision $\vSigma^{-1}$ (Equation \ref{eq:Gaussian_Sigma}) is a moving average update, and the precision slowly gets closer to and tracks $(\color{blue}{\delta\vI} - 2\nabla\_\vSigma \color{purple}{\mathcal{F}\_t})$.
-The update for the mean $\vmu$ (Equation \ref{eq:Gaussian_mu}) is very similar to an update for a (stochastic) gradient update for the mean. A key difference is the additional $\vSigma_{t+1}$ term, which (loosely speaking!) is the 'natural-gradient' part of the update: it automatically determines the learning rate for different elements of the mean $\vmu$.
+The update for the precision $\vSigma^{-1}$ (Equation \eqref{eq:Gaussian_Sigma}) is a moving average update, and the precision slowly gets closer to and tracks $(\color{blue}{\delta\vI} - 2\nabla\_\vSigma \color{purple}{\mathcal{F}\_t})$.
+The update for the mean $\vmu$ (Equation \eqref{eq:Gaussian_mu}) is very similar to an update for a (stochastic) gradient update for the mean. A key difference is the additional $\vSigma_{t+1}$ term, which (loosely speaking!) is the 'natural-gradient' part of the update: it automatically determines the learning rate for different elements of the mean $\vmu$.
 In the second part of the blog post, we will see how this relates to other algorithms such as Adam, which also try and automatically determine learning rates using data.
 
 ### Variational Online-Newton algorithm (VON)
@@ -205,33 +201,27 @@ We are now very close to a complete NGVI algorithm.
 We just need to deal with the $\nabla\_\vmu \color{purple}{\mathcal{F}\_t}$ and $\nabla\_\vSigma \color{purple}{\mathcal{F}\_t}$ terms.
 Fortunately, we can express these in terms of the gradient and Hessian of the negative log-likelihood by invoking Bonnet's and Price's theorems ([Opper & Archambeau, 2009](http://www0.cs.ucl.ac.uk/staff/c.archambeau/publ/neco_mo09_web.pdf); [Rezende et al., 2014](https://arxiv.org/pdf/1401.4082.pdf)):
 
-\begin{equation}
+\begin{align}
    \label{eq:bonnet_gradient}
-   \nabla\_\vmu \color{purple}{\mathcal{F}\_t} = \nabla\_\vmu \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log \color{purple}{p(\data|\vparam)}\right] = \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla\_\vparam \log \color{purple}{p(\data|\vparam)}\right] \hspace{1.5em}= -\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N\color{purple}{\vg(\vparam)} \right],
-\end{equation}
-
-\begin{equation}
+   \nabla\_\vmu \color{purple}{\mathcal{F}\_t} &= \nabla\_\vmu \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log \color{purple}{p(\data\pipe\vparam)}\right] = \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla\_\vparam \log \color{purple}{p(\data\pipe\vparam)}\right] = -\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N\color{purple}{\vg(\vparam)} \right], \newline
    \label{eq:bonnet_hessian}
-   \hspace{1.3em}\nabla\_\vSigma \color{purple}{\mathcal{F}\_t} = \nabla\_\vSigma \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log \color{purple}{p(\data|\vparam)}\right] = \frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla^2\_{\vparam\vparam} \log \color{purple}{p(\data|\vparam)}\right] = -\frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N\color{purple}{\vH(\vparam)} \right],
-\end{equation}
+   \nabla\_\vSigma \color{purple}{\mathcal{F}\_t} &= \nabla\_\vSigma \myexpect\_{q\_{\veta\_t}(\vparam)} \left[\log \color{purple}{p(\data\pipe\vparam)}\right] = \frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[\nabla^2\_{\vparam\vparam} \log \color{purple}{p(\data\pipe\vparam)}\right] = -\frac{1}{2}\myexpect\_{q\_{\veta\_t}(\vparam)} \left[N\color{purple}{\vH(\vparam)} \right],
+\end{align}
 
 where we have used the average per-example gradient $\color{purple}{\vg(\vparam)}$ and Hessian $\color{purple}{\vH(\vparam)}$ of the negative log-likelihood (the dataset has $N$ examples).
 
 One final step. Until now we have been exact in our derivations (given a VI objective and Gaussian approximating family).
-But we now need to make our first approximation to estimate Equations \ref{eq:bonnet_gradient} and \ref{eq:bonnet_hessian}: we use a Monte-Carlo sample $\vparam_t \sim q_{\veta_t}(\vparam) = \gauss(\vparam; \vmu_t, \vSigma_t)$ to approximate the expectation terms.
+But we now need to make our first approximation to estimate Equations \eqref{eq:bonnet_gradient} and \eqref{eq:bonnet_hessian}: we use a Monte-Carlo sample $\vparam_t \sim q_{\veta_t}(\vparam) = \gauss(\vparam; \vmu_t, \vSigma_t)$ to approximate the expectation terms.
 We expect any approximation error to reduce as we increase the number of Monte-Carlo samples.
 
 This leads to an algorithm called Variational Online-Newton (VON) in [Khan et al. (2018)](https://arxiv.org/pdf/1806.04854.pdf),
 
-\begin{equation}
+\begin{align}
    \label{eq:VON_Sigma}
-   \hspace{1em}\vSigma_{t+1}^{-1} = (1-\beta_t)\vSigma_t^{-1} + \beta_t (N \color{purple}{\vH(\vparam_t)} + \color{blue}{\delta\vI})
-\end{equation}
-
-\begin{equation}
+   \hspace{1em}\vSigma_{t+1}^{-1} &= (1-\beta_t)\vSigma_t^{-1} + \beta_t (N \color{purple}{\vH(\vparam_t)} + \color{blue}{\delta\vI}) \newline
    \label{eq:VON_mu}
-   \vmu_{t+1} = \vmu_t - \beta_t \vSigma_{t+1} (N\color{purple}{\vg(\vparam_t)} + \color{blue}{\delta}\vmu_t).
-\end{equation}
+   \vmu_{t+1} &= \vmu_t - \beta_t \vSigma_{t+1} (N\color{purple}{\vg(\vparam_t)} + \color{blue}{\delta}\vmu_t).
+\end{align}
 
 We can run this algorithm on models where we can calculate the gradient and Hessian (such as by using automatic differentiation). But calculating Hessians of (non-toy) neural networks is still difficult. We therefore have to approximate the Hessian $\color{purple}{\vH(\vparam_t)}$ in some way. This is done in the algorithm VOGN.
 
@@ -261,15 +251,12 @@ Here is a full list of changes to go from VON to VOGN with some comments:
 
 These changes lead to our final VOGN algorithm, ready for running on neural networks, 
 
-\begin{equation}
+\begin{align}
    \label{eq:VOGN_mu}
-   \vmu_{t+1} = \vmu_t - \alpha_t \frac{\color{purple}{\hat{\vg}(\vparam_t)} + \color{blue}{\tilde{\delta}}\vmu_t}{\vs_{t+1} + \color{blue}{\tilde{\delta}}},
-\end{equation}
-
-\begin{equation}
+   \vmu_{t+1} &= \vmu_t - \alpha_t \frac{\color{purple}{\hat{\vg}(\vparam_t)} + \color{blue}{\tilde{\delta}}\vmu_t}{\vs_{t+1} + \color{blue}{\tilde{\delta}}}, \newline
    \label{eq:VOGN_Sigma}
-   \hspace{5.5em}\vs_{t+1} = (1-\beta_t)\vs_t + \beta_t \frac{1}{M} \sum_{i\in\mathcal{M}_t}\left( \color{purple}{\vg_i(\vparam_t)}^2 \right),
-\end{equation}
+   \vs_{t+1} &= (1-\beta_t)\vs_t + \beta_t \frac{1}{M} \sum_{i\in\mathcal{M}_t}\left( \color{purple}{\vg_i(\vparam_t)}^2 \right),
+\end{align}
 
 where $\color{blue}{\tilde{\delta}} = \color{blue}{\delta}/N$, and all operations are element-wise.
 
