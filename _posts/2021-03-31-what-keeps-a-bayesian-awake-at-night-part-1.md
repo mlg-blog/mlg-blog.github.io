@@ -55,13 +55,13 @@ The probabilistic approach supports decision making in a third stage which goes 
     (\text{average unhappiness})(\delta) = \E_{p(X \cond D)}[L(X, \delta)].
 \end{equation}
 
-This quantity is called the *Bayes risk*. We now pick the decision that we expect to be least unhappy about by minimising our expected unhappiness with respect to our decision $\delta$, and we're done!
+This quantity is called the *posterior expected loss*[^7]. We now pick the decision that we expect to be least unhappy about by minimising our expected unhappiness with respect to our decision $\delta$, and we're done!
 
 **Summary.** This framework proposes a cleanly separated sequential three-step procedure: first, articulate your assumptions about the data via a probabilistic model; second, compute the posterior distribution over unknown variables; and third, select the decision which minimises the average loss under the posterior. 
 
 ## What's the formal justification for the probabilistic approach to inference and decision making?
 
-Why does a Bayesian represent their beliefs with probabilities[^4], reason according to the sum and product rule, and select actions which minimise the Bayes risk? We'll now review the most common theoretical arguments.
+Why does a Bayesian represent their beliefs with probabilities[^4], reason according to the sum and product rule, and select actions which minimise the posterior expected loss? We'll now review the most common theoretical arguments.
 
 **(1) de Finetti's exchangeability theorem** justifies the use of model parameters $\theta$, conditional distributions $p(D_n \cond \theta)$ over data given parameters (also called the *likelihood of parameters*), and critically *prior distributions over parameters* $p(\theta)$ when specifying probabilistic models. The theorem says that if you believe the order in which the data $D = (D_n)\_{n=1}^N$ arrives is unimportant --- $p(D)$ is invariant to the order of $(D_n)\_{n=1}^N$, an idea called *exchangeability* --- then there exists a random variable $\theta$ with associated prior distribution such that the data $D$ are i.i.d. given $\theta$ and your belief is recovered by marginalising over $\theta$:
 
@@ -103,6 +103,8 @@ It is striking that a number of arguments based on a diversity of desirable prop
 [^2]: This was in the Approximate Inference Workshop at NeurIPS in 2017.
 
 [^3]: Parameters are distinguished from variables by asking what happens as we see more data: variables get more numerous, parameters do not. 
+
+[^7]: We previously incorrectly called the posterior expected loss the *Bayes risk*. Thanks to Corey Yanofsky for pointing out the mistake.
 
 [^4]: That probabilities represent degrees of belief is only one interpretation of probability. For example, in *Probability, Statistics, and Truth* ([Von Mises, 1928](https://store.doverpublications.com/0486242145.html)), von Mises argues that probability concerns limiting frequencies of repeating events. In this view and contrary to the Bayesian view, it is meaningless to talk about the probability of a one-off event: it is not possible to repeatedly sample that one-off event, which means that it doesn't have a limiting frequency.
 
