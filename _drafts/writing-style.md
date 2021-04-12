@@ -33,6 +33,12 @@ consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
 cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
+## Em Dashes
+
+Em dashes are totally fine to use, but please don't over overuse them.
+Em dashes should be written as `---` with an additional space on both sides.
+For example, `bla --- bla`, but not `bla---bla` or `bla -- bla`.
+
 ## Equations
 
 You can render inline math by using single dollar signs.
@@ -53,6 +59,10 @@ renders as
 \end{equation}
 
 You can then reference this equation with `\eqref{eq:f}`: \eqref{eq:f}.
+Reference equations with `eqref` instead of `ref`.
+
+The convention is to show equation numbers rather than supressing them: use the `equation` environment rather than `equation*`.
+Moreover, use environments like `align` to get equations to align nicely; avoid manual spacing with `hspace` and `vspace` where possible.
 
 ## Code
 
@@ -129,7 +139,7 @@ An example of an image is as follows:
     name="Figure 1"
     ref="draft"
     alt="Draft"
-    url="https://lh3.googleusercontent.com/proxy/AqPURYdtoNJirZJ9mUqtVZ2ki7UTr1X3GHQTg5jHynsPgEYYLmlC9MzREAKarm8nTi7MFvFb3_DNAABSHyelGaYXmqZr1nc4KeB2o5CT_A-xj1bCjA9LfzZm"
+    url="https://picsum.photos/500/300"
     width=300
 %}{% endraw %}
 ```
@@ -194,6 +204,6 @@ References should be formatted as follows:
 
 * if there are two authors: [Lastname1 & Lastname2 (2020)](https://link/to/paper); and
 
-* if there are thee or more authors: [Lastname1 et al. (2020)](https://link/to/paper).
+* if there are thee or more authors: [Lastname1 _et al._ (2020)](https://link/to/paper).
 
 References should link to a PDF of the paper, if possible, or otherwise a page where the paper can be found.
