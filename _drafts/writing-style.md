@@ -35,9 +35,13 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 ## Em Dashes
 
-Em dashes are totally fine to use, but please don't over overuse them.
+Em dashes are fine to use, but please don't over overuse them.
 Em dashes should be written as `---` with an additional space on both sides.
 For example, `bla --- bla`, but not `bla---bla` or `bla -- bla`.
+
+## Latin
+
+Latin expressions should be italicised, _e.g._ like this.
 
 ## Equations
 
@@ -206,4 +210,5 @@ References should be formatted as follows:
 
 * if there are thee or more authors: [Lastname1 _et al._ (2020)](https://link/to/paper).
 
-References should link to a PDF of the paper, if possible, or otherwise a page where the paper can be found.
+References should link to the paper.
+Try to use links which will still be available a long time from now, like [DOI links](https://www.doi.org/).
