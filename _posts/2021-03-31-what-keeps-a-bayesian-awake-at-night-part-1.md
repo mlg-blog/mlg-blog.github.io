@@ -5,6 +5,8 @@ tags:        [theory, foundations]
 authors:
     - name: Wessel Bruinsma
       link: https://wesselb.github.io
+    - name: Andrew Y. K. Foong
+      link: https://andrewfoongyk.github.io
     - name: Richard E. Turner
       link: http://cbl.eng.cam.ac.uk/Public/Turner/Turner
 comments:    true
