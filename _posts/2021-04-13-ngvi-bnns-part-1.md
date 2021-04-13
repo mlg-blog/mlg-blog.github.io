@@ -59,7 +59,7 @@ For a more detailed explanation, please look at the motivation in papers such as
 
 It therefore makes sense to try and apply natural-gradient updates to VI for NNs, where speed of convergence has been an issue.
 In this blog post, we do this while looking closely at the mathematical details.
-We will follow the appendices in [Khan et al. (2018)](https://arxiv.org/pdf/1806.04854.pdf).
+We will follow the appendices in [Khan et al. (2018)](https://arxiv.org/pdf/1806.04854.pdf) (there is a slightly different derivation in [Zhang et al. (2018)](https://arxiv.org/pdf/1712.02390.pdf)).
 I also hope that, after reading this blog, you will be able to confidently approach recent papers that use NGVI, papers which often assume some knowledge of how NGVI algorithms are derived.
 
 ## Starting with the basics
@@ -110,7 +110,7 @@ Let's say that we have some function $\loss(\veta)$ that we want to optimise wit
    \veta_{t+1} = \veta_t + \beta_t \vF(\veta_t)^{-1}\nabla_\veta \loss(\veta_t),
 \end{equation}
 
-where $\nabla_\veta \loss(\veta_t) = \nabla_\veta \loss(\veta) \pipe_{\veta=\veta_t}$, $\vF(\veta_t) = \myexpect_{q_\veta(\vparam)} \left[ \nabla_\veta q_\veta(\vparam) \nabla_\veta q_\veta(\vparam)^\top \right]$ is the Fisher information matrix, and $\beta_t$ is a learning rate.
+where $\nabla_\veta \loss(\veta_t) = \nabla_\veta \loss(\veta) \pipe_{\veta=\veta_t}$, $\vF(\veta_t) = \myexpect_{q_\veta(\vparam)} \left[ \nabla_\veta \log q_\veta(\vparam) \nabla_\veta \log q_\veta(\vparam)^\top \right]$ is the Fisher information matrix, and $\beta_t$ is a learning rate.
 As previously discussed, natural-gradient methods incorporate the information geometry of the distribution being optimised (through the Fisher information matrix), and therefore reduce the number of gradient steps required.
 Some good references include [Amari (1998)](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.452.7280&rep=rep1&type=pdf) and [Martens (2014)](https://arxiv.org/pdf/1412.1193.pdf).
 
@@ -245,7 +245,7 @@ Here is a full list of changes to go from VON to VOGN with some comments:
 3. Use a mean-field approximating family instead of a full-covariance Gaussian: $\mathbf{S}_t = \text{diag} (\vs_t)$.
   - This drastically reduces the number of parameters and is a common approximation employed in variational Bayesian neural networks.
    But we do not have to stick to this. SLANG ([Mishkin et al., 2018](https://arxiv.org/pdf/1811.04504.pdf)) uses a low-rank + diagonal covariance structure.
-   In the second part of this blog, we will see a K-FAC approximation.
+   In the second part of this blog, we will see a K-FAC approximation ([Zhang et al., 2018](https://arxiv.org/pdf/1712.02390.pdf)).
 4. Use the Gauss-Newton approximation to the (diagonal) Hessian: ${\color{purple}\vH(\vparam_t)} \approx \frac{1}{M} \sum_{i\in\mathcal{M}_t} \left( {\color{purple}\vg_i(\vparam_t)}^2 \right)$.
   - We have calculated this on a minibatch of data, and simplified the calculation to be element-wise squaring as we are using a diagonal approximation.
 5. Use separate learning rates $\{\alpha_t, \beta_t\}$ in the update equations for $\{\vmu_t, \vs_t\}$.
