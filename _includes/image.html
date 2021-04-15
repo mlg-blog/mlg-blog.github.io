@@ -1,8 +1,5 @@
 <div
     class="image-container"
-    {% if include.width %}
-        style="max-width: {{ include.width }}px"
-    {% endif %}
     >
     <img
         {% if include.src %}
@@ -16,12 +13,12 @@
             id="figure-{{ include.ref }}"
         {% endif %}
         {% if include.width %}
-            style="width: 100%"
+            style="width: 100%; max-width: {{ include.width }}px"
         {% endif %}
         >
     {% if include.name %}
-        <div class="caption">
+        <p class="caption">
             {{ include.name }}: {{ include.alt }}
-        </div>
+        </p>
     {% endif %}
 </div>
