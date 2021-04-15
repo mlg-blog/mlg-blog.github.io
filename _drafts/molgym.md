@@ -10,7 +10,7 @@ authors:
 comments:   true
 image:      /assets/images/molgym/intro.png
 excerpt: |
-    Designing molecules with desirable properties has huge potential for drug design and materials discovery. However, searching for novel molecules is like trying to find the needle in a haystack. Fortunately, we can catalyse this process using ideas from reinforcement learning and quantum mechanics.
+    Designing molecules with desirable properties has huge potential for drug design and materials discovery. However, searching for novel molecules   with specific properties is like trying to find the needle in a haystack. Fortunately, we can catalyse this process using ideas from reinforcement learning and quantum mechanics.
 ---
 
 Imagine we were able to design molecules with exactly the properties we care about. This would unlock huge potential for applications such as de novo drug design and materials discovery. Unfortunately, searching for particular chemical compounds is like trying to find the needle in a haystack: [Polishchuk _et al._ (2013)](https://doi.org/10.1007/s10822-013-9672-4) estimate that there are between $10^{30}$ and $10^{60}$ feasible and potentially drug-like molecules, making exhaustive search hopeless.
@@ -31,7 +31,11 @@ In particular, we design molecules by sequentially drawing atoms from a given ba
     width=650
 %}
 
-An advantage of designing molecules in Cartesian space is that we can evaluate states in terms of quantum-mechanical properties.[^1] Here, we focus on designing stable molecules as measured in terms of their energy; however, linear combinations of other desirable properties (like drug-likeliness or toxicity) would also be possible. We define the reward $r_t$ as the negative energy difference between the next state $s_{t+1}$ and the current state $s_t$. Importantly, the episodic return for building a molecule does not depend on the order in which atoms are placed.
+An advantage of designing molecules in Cartesian space is that we can evaluate states in terms of quantum-mechanical properties.[^1] Here, the reward function encourages the agent to design stable molecules as measured in terms of their energy; however, linear combinations of other desirable properties (like drug-likeliness or toxicity) would also be possible. We define the reward as the negative difference in energy between the resulting molecule described by $\mathcal{C}\_{t+1}$ and the sum of energies of the current molecule $\mathcal{C}\_t$ and a new atom of element $e\_t$,
+\begin{equation}
+    r(s\_t, a\_t) = \left[E(\mathcal{C}\_t) + E(e\_t)\right] - E(\mathcal{C}\_{t+1}),
+\end{equation}
+where $E(e) := E(\{ (e, [0,0,0]^T \})$. We compute the energy using a fast semi-empirical quantum-chemical method. Importantly, the episodic return for building a molecule does not depend on the order in which atoms are placed.
 
 ## Exploiting Symmetry using Internal Coordinates ([Simm et al., 2020](http://proceedings.mlr.press/v119/simm20b.html))
 
@@ -67,7 +71,7 @@ While these results look promising, the $\mathsf{Internal}$ agent actually strug
     ref="fail"
     alt="Example of two configurations (a) and (b) that the $\mathsf{Internal}$ agent cannot distinguish. While the values for distance $d$, and angles $\alpha$ and $\psi$ are the same, choosing different reference points (in red) leads to a different action. This is particularly problematic in symmetric states, where one cannot uniquely determine these reference points."
     src="molgym/fail.png"
-    width=700
+    width=600
 %}
 
 ## Exploiting Symmetry using Spherical Harmonics ([Simm et al., 2021](https://openreview.net/forum?id=jEYKjPE1xYN))
@@ -77,7 +81,7 @@ Therefore, we replace the angles $\alpha$ and $\psi$ by directly sampling the or
 {% include image.html
     name="Figure 5"
     ref="covariant_agent"
-    alt="The $\mathsf{Covariant}$ agent chooses focal atom $f$, element $e$, distance $d$, and orientation $\tilde{x}$. We then map back to global coordinates $x$ to obtain action $a = (e, x)$."
+    alt="The $\mathsf{Covariant}$ agent chooses focal atom $f$, element $e$, distance $d$, and orientation $\tilde{x}$. We then map back to global coordinates $x$ to obtain action $a_t = (e, x)$."
     src="molgym/covariant_agent.png"
     width=650
 %}
@@ -98,8 +102,8 @@ To verify that $\mathsf{Covariant}$ works as expected, we compare it to the prev
 Let's end here for now, even though we were really just getting started. To summarise, we have presented a novel reinforcement learning formulation for 3D molecular design guided by quantum mechanics. The key insight to get it to work was to exploit the symmetries of the design process, particularly using spherical harmonics.
 
 One aspect we didn't show today is how flexible this framework actually is. For example, we can use it to learn across multiple bags at the same time and generalise (to some extent) to unseen bags. Of course we can also scale up to larger molecules, though not quite as large as graph-based methods yet. Finally, we can even build molecular clusters, _e.g._ to model solvation processes. If that sounds interesting to you, make sure to check out the full papers:
-1. [Simm _et al._ (2020)](http://proceedings.mlr.press/v119/simm20b.html). Reinforcement Learning for Molecular Design Guided by Quantum Mechanics. ICML.  
-2. [Simm _et al._ (2021)](https://openreview.net/forum?id=jEYKjPE1xYN). Symmetry-Aware Actor-Critic for 3D Molecular Design. ICLR.
+1. [Simm _et al._ (2020)](http://proceedings.mlr.press/v119/simm20b.html). Reinforcement Learning for Molecular Design Guided by Quantum Mechanics. ICML 2020.  
+2. [Simm _et al._ (2021)](https://openreview.net/forum?id=jEYKjPE1xYN). Symmetry-Aware Actor-Critic for 3D Molecular Design. ICLR 2021.
 
 [^1]: In contrast, graph-based approaches have to resort to heuristic reward functions.
 [^2]: We estimate the optimal return by using structural optimisation techniques to obtain the optimal structure and its energy.
