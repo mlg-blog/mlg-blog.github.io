@@ -10,18 +10,18 @@ authors:
 comments:   true
 image:      /assets/images/molgym/intro.png
 excerpt: |
-    Designing molecules with desirable properties has huge potential for drug design and materials discovery. However, searching for novel molecules   with specific properties is like trying to find the needle in a haystack. Fortunately, we can catalyse this process using ideas from reinforcement learning and quantum mechanics.
+    Automating the design of molecules with desirable properties can greatly accelerate the search for novel drugs and materials. However, to make further progress we need to go beyond graph-based approaches. In this blog post, we use ideas from reinforcement learning and quantum chemistry to make a first step towards 3D molecular design.
 ---
 
-Imagine we were able to design molecules with exactly the properties we care about. This would unlock huge potential for applications such as de novo drug design and materials discovery. Unfortunately, searching for particular chemical compounds is like trying to find the needle in a haystack: [Polishchuk _et al._ (2013)](https://doi.org/10.1007/s10822-013-9672-4) estimate that there are between $10^{30}$ and $10^{60}$ feasible and potentially drug-like molecules, making exhaustive search hopeless.
+Imagine we were able to design molecules with exactly the properties we care about. This would unlock huge potential for applications such as de novo drug design and materials discovery. Unfortunately, searching for particular chemical compounds is like trying to find the needle in a haystack: [Polishchuk _et al._ (2013)](https://doi.org/10.1007/s10822-013-9672-4) estimate that there are between $10^{30}$ and $10^{60}$ feasible and potentially drug-like molecules, making exhaustive search hopeless. Worse yet, we don’t even know what the needle looks like.
 
-In this blog post, we will outline how we combine ideas from reinforcement learning and quantum mechanics to catalyse the search for new molecules. We will explain how we can push the boundaries of the type of molecules we can build by representing the atoms directly in Cartesian coordinates. Finally, we will demonstrate how we can exploit symmetries of the design process to efficiently train a reinforcement learning agent for molecular design.
+In this blog post, we will outline how we combine ideas from reinforcement learning and quantum chemistry to catalyse the search for new molecules. We will explain how we can push the boundaries of the type of molecules we can build by representing the atoms directly in Cartesian coordinates. Finally, we will demonstrate how we can exploit symmetries of the design process to efficiently train a reinforcement learning agent for molecular design.
 
-## Re-framing Molecular Design using Reinforcement Learning and Quantum Mechanics
+## Re-framing Molecular Design using Reinforcement Learning and Quantum Chemistry
 
 To be able to design general molecular structures, it is critical to choose the right representation. Most approaches rely on graph representations of molecules, where atoms and bonds are represented by nodes and edges, respectively. However, this is a strongly simplified model designed for the description of single organic molecules. It is unsuitable for encoding metals and molecular clusters as it lacks information about the relative position of atoms in 3D space. Further, geometric constraints on the molecule cannot be easily encoded in the design process. A more general representation closer to the physical system is one in which a molecule is described by its atoms' positions in Cartesian coordinates. We therefore directly work in this space.
 
-In particular, we design molecules by sequentially drawing atoms from a given bag and placing them onto a 3D canvas. The canvas $\mathcal{C}$ contains all atoms $(e, x)$ with element $e \in \\{\ce{H}, \ce{C}, \ce{N}, \ce{O}\, \dots \\}$ and position $x \in \mathbb{R}^3$ placed so far, whereas the bag $\mathcal{B}$ comprises atoms still to be placed. We formulate this task as a sequential decision-making problem in a Markov decision process, where the agent is rewarded for building stable molecules. At the beginning of each episode, the agent receives an initial state $s\_0 = (\mathcal{C}\_{0}, \mathcal{B}\_0)$, for example $\mathcal{C}\_0 = \emptyset$ and $\mathcal{B}\_0 = \ce{SFO_4}$ (see [Figure 1](#figure-env)). At each timestep $t$, the agent draws an atom from the bag and places it onto the canvas through action $a_t$, yielding reward $r_t$ and transitioning the environment into state $s_{t+1}$. This process is repeated until the bag is empty.
+In particular, we design molecules by sequentially drawing atoms from a given bag and placing them onto a 3D canvas. The canvas $\mathcal{C}$ contains all atoms $(e, x)$ with element $e \in \\{\ce{H}, \ce{C}, \ce{N}, \ce{O}\, \dots \\}$ and position $x \in \mathbb{R}^3$ placed so far, whereas the bag $\mathcal{B}$ comprises atoms still to be placed. We formulate this task as a sequential decision-making problem in a Markov decision process, where the agent is rewarded for building stable molecules. At the beginning of each episode, the agent receives an initial state $s\_0 = (\mathcal{C}\_{0}, \mathcal{B}\_0)$, _e.g._ $\mathcal{C}\_0 = \emptyset$ and $\mathcal{B}\_0 = \ce{SFO_4}$ (see [Figure 1](#figure-env)). At each timestep $t$, the agent draws an atom from the bag and places it onto the canvas through action $a_t$, yielding reward $r_t$ and transitioning the environment into state $s_{t+1}$. This process is repeated until the bag is empty.
 
 {% include image.html
     name="Figure 1"
@@ -35,25 +35,25 @@ An advantage of designing molecules in Cartesian space is that we can evaluate s
 \begin{equation}
     r(s\_t, a\_t) = \left[E(\mathcal{C}\_t) + E(e\_t)\right] - E(\mathcal{C}\_{t+1}),
 \end{equation}
-where $E(e) := E(\{ (e, [0,0,0]^T \})$. We compute the energy using a fast semi-empirical quantum-chemical method. Importantly, the episodic return for building a molecule does not depend on the order in which atoms are placed.
+where $E(e) := E(\{e, [0,0,0]^T \})$. We compute the energy using a fast semi-empirical quantum-chemical method. Importantly, the episodic return for building a molecule does not depend on the order in which atoms are placed.
 
 ## Exploiting Symmetry using Internal Coordinates ([Simm et al., 2020](http://proceedings.mlr.press/v119/simm20b.html))
 
-Learning to place atoms in Cartesian coordinates requires that the agent exploits the symmetries of the molecular design process. Therefore, we need a policy $\pi(a_t \vert s_t)$ that is _covariant_ to translation and rotation. In other words, if the canvas is rotated or translated, the position $x$ of the atom to be placed should be rotated and translated as well.
+Learning to place atoms in Cartesian coordinates requires that the agent exploits the symmetries of the molecular design process. Therefore, we need a policy $\pi(a_t \vert s_t)$ that is _covariant_[^2] to translation and rotation. In other words, if the canvas is rotated or translated, the position $x$ of the atom to be placed should be rotated and translated as well.
 
 To achieve this, we first encode the current state $s_t$ into an invariant representation $s^\text{inv} = \mathsf{SchNet}(s_t)$, where $\mathsf{SchNet}$ ([Schütt _et al._, 2017](https://proceedings.neurips.cc/paper/2017/hash/303ed4c69846ab36c2904d3ba8573050-Abstract.html); [Schütt _et al._, 2018](https://doi.org/10.1063/1.5019779)) is a neural network architecture that models interactions between atoms. Given $s^\text{inv}$, our agent selects 1) a focal atom $f$ among already placed atoms that acts as a reference point, 2) an available element $e$ from the bag for the atom to be placed, and 3) the position of the atom to be placed in internal coordinates (see [Figure 2](#figure-internal_agent)). These coordinates consist of the distance $d$ to the focal atom as well as angles $\alpha$ and $\psi$ with respect to the focal atom and its neighbours. Finally, we obtain a position $x$ that features the required covariance by mapping the internal coordinates back to Cartesian coordinates. We call the resulting agent $\mathsf{Internal}$.
 
 {% include image.html
     name="Figure 2"
     ref="internal_agent"
-    alt="The $\mathsf{Internal}$ agent places an atom by choosing focal atom $f$, element $e$, distance $d$, and angles $\alpha$ and $\psi$. We then map back to global coordinates $x$ to obtain action $a_t = (e, x)$."
+    alt="The $\mathsf{Internal}$ agent places an atom from the bag (highlighted in orange) relative to the focal atom (highlighted in purple), where the internal coordinates $(d, \alpha, \psi)$ uniquely determine its absolute position."
     src="molgym/internal_agent.png"
     width=500
 %}
 
 ## So... does it work?
 
-Equipped with a policy, we can finally design some molecules! To demonstrate how the $\mathsf{Internal}$ agent works, we separately train it on the bags $\ce{CH_3N_O}, \ce{CH_4O}$ and $\ce{C_2H_2O_2}$ using PPO ([Schulman _et al._, 2017](https://arxiv.org/abs/1707.06347)). [Figure 3](#figure-singles) shows that the agent is able to learn interatomic distances as well as the rules of chemical bonding from scratch. On average, the agent reaches $90\%$ of the optimal return[^2] after only $12\,000$ steps. However, from the snapshots $\enclose{circle}{2}$ and $\enclose{circle}{3}$ in [Figure 3](#figure-singles) (b) we can see that the generated structures are not quite optimal yet. While the policy has mostly learned the atomic distances, it still has to figure out the angles between atoms. After training the policy for a bit longer, at point $\enclose{circle}{4}$ we finally generate valid, stable molecules. It works!
+Equipped with a policy, we can finally design some molecules! To demonstrate how the $\mathsf{Internal}$ agent works, we separately train it on the bags $\ce{CH_3N_O}, \ce{CH_4O}$ and $\ce{C_2H_2O_2}$ using PPO ([Schulman _et al._, 2017](https://arxiv.org/abs/1707.06347)). [Figure 3](#figure-singles) shows that the agent is able to learn interatomic distances as well as the rules of chemical bonding from scratch. On average, the agent reaches $90\%$ of the optimal return[^3] after only $12\,000$ steps. However, from the snapshots $\enclose{circle}{2}$ and $\enclose{circle}{3}$ in [Figure 3](#figure-singles) (b) we can see that the generated structures are not quite optimal yet. While the policy has mostly learned the atomic distances, it still has to figure out the angles between atoms. After training the policy for a bit longer, at point $\enclose{circle}{4}$ we finally generate valid, stable molecules. It works!
 
 {% include image.html
     name="Figure 3"
@@ -71,7 +71,7 @@ While these results look promising, the $\mathsf{Internal}$ agent actually strug
     ref="fail"
     alt="Example of two configurations (a) and (b) that the $\mathsf{Internal}$ agent cannot distinguish. While the values for distance $d$, and angles $\alpha$ and $\psi$ are the same, choosing different reference points (in red) leads to a different action. This is particularly problematic in symmetric states, where one cannot uniquely determine these reference points."
     src="molgym/fail.png"
-    width=600
+    width=450
 %}
 
 ## Exploiting Symmetry using Spherical Harmonics ([Simm et al., 2021](https://openreview.net/forum?id=jEYKjPE1xYN))
@@ -99,11 +99,17 @@ To verify that $\mathsf{Covariant}$ works as expected, we compare it to the prev
 
 ## That's it --- a first step towards general molecular design in Cartesian coordinates
 
-Let's end here for now, even though we were really just getting started. To summarise, we have presented a novel reinforcement learning formulation for 3D molecular design guided by quantum mechanics. The key insight to get it to work was to exploit the symmetries of the design process, particularly using spherical harmonics.
+Let's end here for now, even though we were really just getting started. To summarise, we have presented a novel reinforcement learning formulation for 3D molecular design guided by quantum chemistry. The key insight to get it to work was to exploit the symmetries of the design process, particularly using spherical harmonics.
 
 One aspect we didn't show today is how flexible this framework actually is. For example, we can use it to learn across multiple bags at the same time and generalise (to some extent) to unseen bags. Of course we can also scale up to larger molecules, though not quite as large as graph-based methods yet. Finally, we can even build molecular clusters, _e.g._ to model solvation processes. If that sounds interesting to you, make sure to check out the full papers:
 1. [Simm _et al._ (2020)](http://proceedings.mlr.press/v119/simm20b.html). Reinforcement Learning for Molecular Design Guided by Quantum Mechanics. ICML 2020.  
 2. [Simm _et al._ (2021)](https://openreview.net/forum?id=jEYKjPE1xYN). Symmetry-Aware Actor-Critic for 3D Molecular Design. ICLR 2021.
 
+## Join us at ICLR 2021!
+
+Finally, feel free to join our upcoming poster session at [ICLR 2021](https://iclr.cc/Conferences/2021/Dates) if you want to talk to us directly:  
+**Monday, 3 May 2021, 17:00-19:00 (GMT+1)**
+
 [^1]: In contrast, graph-based approaches have to resort to heuristic reward functions.
-[^2]: We estimate the optimal return by using structural optimisation techniques to obtain the optimal structure and its energy.
+[^2]: More precisely, only the position $x$ needs to be covariant, whereas the element $e$ has to be invariant.
+[^3]: We estimate the optimal return by using structural optimisation techniques to obtain the optimal structure and its energy.
