@@ -105,10 +105,6 @@ One aspect we didn't show today is how flexible this framework actually is. For 
 1. [Simm _et al._ (2020)](http://proceedings.mlr.press/v119/simm20b.html). Reinforcement Learning for Molecular Design Guided by Quantum Mechanics. ICML 2020.  
 2. [Simm _et al._ (2021)](https://openreview.net/forum?id=jEYKjPE1xYN). Symmetry-Aware Actor-Critic for 3D Molecular Design. ICLR 2021.
 
-## Join us at ICLR 2021!
-
-Finally, feel free to join our upcoming poster session at [ICLR 2021](https://iclr.cc/Conferences/2021/Dates) if you want to talk to us directly:  
-**Monday, 3 May 2021, 17:00-19:00 (GMT+1)**
 
 [^1]: In contrast, graph-based approaches have to resort to heuristic reward functions.
 [^2]: More precisely, only the position $x$ needs to be covariant, whereas the element $e$ has to be invariant.
