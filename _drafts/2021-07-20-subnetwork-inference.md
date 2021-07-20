@@ -25,7 +25,10 @@ The standard practice in deep learning is to estimate the parameters using just 
 The problem is that modern deep neural nets are so big that even trying to approximate this posterior is highly non-trivial. We are not even talking about humongous 100-billion-parameter models like OpenAI’s GPT-3 here ([Brown _et al._, 2020](https://arxiv.org/abs/2005.14165)) --- even for a neural net with more than just a few layers it’s hard to do good posterior inference! Therefore, it’s becoming more and more challenging to design approximate inference methods that actually scale.
 
 To cope with this problem, many existing Bayesian deep learning methods make very strong and unrealistic approximations to the structure of the posterior. For example, the common _mean field approximation_ approximates the posterior by a distribution which fully factorises over individual weights. Unfortunately, recent papers ([Ovadia _et al._, 2019](https://arxiv.org/abs/1906.02530); [Foong _et al._, 2019](https://arxiv.org/abs/1906.11537)) have empirically demonstrated that such strong assumptions result in bad performance on downstream tasks such as uncertainty estimation. Can we do better than this?
+$\newcommand{\vy}{\mathbf{y}}$
 $\newcommand{\vw}{\mathbf{w}}$
+$\newcommand{\mH}{\mathbf{H}}$
+$\newcommand{\mX}{\mathbf{X}}$
 $\newcommand{\D}{\mathcal{D}}$
 $\newcommand{\c}{\textsf{c}}$
 
@@ -73,5 +76,40 @@ There are a few questions that we still need to answer:
 5. How does subnetwork inference perform in practice?
 
 Let’s start with question (1).
+
+## (1) How do we choose and infer the subnetwork posterior ?
+
+In this work, we infer a full-covariance Gaussian posterior over the subnetwork using the Laplace approximation, which is a classic approximate inference technique. If you don't recall how the Laplace approximation works, below we provide a short summary. For more details on the Laplace approximation and a review of its use in deep learning, please refer to [Daxberger et al. (2021)](https://arxiv.org/abs/2106.14806).
+
+The Laplace approximation proceeds in two steps.
+1. Obtain a point estimate over all model weights using maximum a-posteriori (short MAP) inference. In deep learning, this is typically done using stochastic gradient-based optimisation methods such as SGD.
+\begin{equation}
+   \hat\vw = \argmax_{\vw} \, [\log p(\vy \cond \mX, \vw) + \log p(\vw)]
+\end{equation}
+
+2. Locally approximate the log-density of the posterior with a second-order Taylor expansion. This produces a full-covariance Gaussian posterior over the weights, where the mean of the Gaussian is simply the MAP estimate, and the covariance matrix of the Gaussian is the inverse Hessian $\mH$ of the loss with respect to the weights $\vw$ (averaged over the training data points):
+\begin{equation}
+   p(w \cond \D) \approx q(\vw) = \Normal(\vw \cond \hat\vw, \mH^{-1}).
+\end{equation}
+
+What this essentially does is it defines a Gaussian centered at the MAP estimate, with a covariance matrix that matches the curvature of the loss at the MAP estimate, as illustrated in [Figure 2](#figure-laplace).
+
+{% include image.html
+   name="Figure 2"
+   ref="laplace"
+   alt="A conceptual illustration of the Laplace approximation in one dimension (image adapted with kind permission from Richard Turner). We plot the parameter $\mathbf{w}$ (x-axis) against the density of the true posterior $p(\mathbf{w}\cond\mathcal{D})$ (in black) as well as that of the corresponding Laplace approximation $q(\mathbf{w})$ (in red). As we can see, $q(\mathbf{w})$ is a Gaussian centered at the mode $\widetilde{\mathbf{w}}$ of the posterior $p(\mathbf{w}\cond\mathcal{D})$, with covariance matrix matching the curvature of $p(\mathbf{w}\cond\mathcal{D})$ at $\widetilde{\mathbf{w}}$."
+   src="subnetwork-inference/laplace.png"
+   width=400
+%}
+
+The main advantage of the Laplace approximation, and also the reason why we use it, is that it is applied _post-hoc_ on top of a MAP estimate and doesn't require us to re-train the network. This is practically very appealing as MAP estimation is something we can do very well in deep neural nets. The main issue, however, is that it requires us to compute, store, and invert the full Hessian $\mH$ over all weights. This scales quadratically in space and cubically in time (in terms of the number of weights) and is therefore computationally intractable for modern neural nets.
+
+Fortunately, in our case, we don’t actually want to do inference over _all_ the weights, but only over a subnetwork. In this case, the second step of the Laplace approximation involves inferring a full-covariance Gaussian posterior over only the subnetwork weights $\vw_S$:
+\begin{equation}
+   p(\vw_S \cond \D) \approx q(\vw_S) = \Normal(\vw_S \cond \hat\vw_S, \mH_S^{-1}).
+\end{equation}
+This is now tractable, since the subnetwork will in practice be substantially smaller than the full network, effectively giving us quadratic gains in space complexity and cubic gains in time complexity!
+
+
 
 
