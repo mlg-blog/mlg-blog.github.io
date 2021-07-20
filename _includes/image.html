@@ -8,7 +8,7 @@
         {% if include.url %}
             src="{{ include.url }}"
         {% endif %}
-        alt="{{ include.alt }}"
+        alt="{{ include.alt | strip_html }}"
         {% if include.ref %}
             id="figure-{{ include.ref }}"
         {% endif %}
