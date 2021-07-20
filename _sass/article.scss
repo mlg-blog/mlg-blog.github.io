@@ -208,6 +208,21 @@ main {
     ul p, ol p {
         margin: 0;
     }
+    ol.parentheses {
+        counter-reset: list;
+
+        &>li {
+            list-style: none;
+            position: relative;
+
+            &:before {
+                counter-increment: list;
+                content: "(" counter(list, number) ") ";
+                position: absolute;
+                left: -1.4em;
+            }
+        }
+    }
 
     // Tables
     table {
