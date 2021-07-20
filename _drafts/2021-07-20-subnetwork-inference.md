@@ -58,38 +58,38 @@ Assume that we have divided the weights $\vw$ into two disjoint subsets: (1) the
    p(\vw \cond \D)
    \overset{\text{(i)}}{\approx}
       p(\vw_S \cond \D)
-      \prod_{r \in S^\c} \delta(\vw\_r - \hat{\vw}\_r)
+      \prod_{r \in S^\c} \delta(\vw\_r - \widehat{\vw}\_r)
    \overset{\text{(ii)}}{\approx}
       q(\vw_S)
-      \prod_{r \in S^\c} \delta(\vw\_r - \hat{\vw}\_r)
+      \prod_{r \in S^\c} \delta(\vw\_r - \widehat{\vw}\_r)
    =: q\_S(\vw).
 \end{equation}
-The first step (i) of our posterior approximation then involves a posterior distribution over just the subnetwork $\vw_S$, and delta functions over all remaining weights $\\{\vw\_r\\}\_{r \in S^\c}$. Put differently, we only treat the subnetwork $\vw_S$ in a probabilistic way, and assume that each remaining weight $\vw_r$ is deterministic and set to some fixed value $\hat\vw_r$. Unfortunately, exact inference over the subnetwork is still intractable, so, in the second step (ii) of our approximation, we introduce an approximate posterior $q$ over the subnetwork $\vw_S$. Importantly, as the subnetwork is much smaller than the full network, this allows us to use expressive posterior approximations that would otherwise be computationally intractable (_e.g._ full-covariance Gaussians). That’s it.
+The first step (i) of our posterior approximation then involves a posterior distribution over just the subnetwork $\vw_S$, and delta functions over all remaining weights $\\{\vw\_r\\}\_{r \in S^\c}$. Put differently, we only treat the subnetwork $\vw_S$ in a probabilistic way, and assume that each remaining weight $\vw_r$ is deterministic and set to some fixed value $\widehat\vw_r$. Unfortunately, exact inference over the subnetwork is still intractable, so, in the second step (ii) of our approximation, we introduce an approximate posterior $q$ over the subnetwork $\vw_S$. Importantly, as the subnetwork is much smaller than the full network, this allows us to use expressive posterior approximations that would otherwise be computationally intractable (_e.g._ full-covariance Gaussians). That’s it.
 
 There are a few questions that we still need to answer:
 
-{: class="parentheses" }
+{: class="custom questions" }
 1. How do we choose and infer the subnetwork posterior $q(\vw\_S)$? That is, what form does $q$ have, and how do we infer its parameters?
-2. How do we set the fixed values $\hat\vw\_r$ of all remaining weights $\\{\vw\_r\\}\_{r \in S^\c}$?
+2. How do we set the fixed values $\widehat\vw\_r$ of all remaining weights $\\{\vw\_r\\}\_{r \in S^\c}$?
 3. How do we select the subnetwork $\vw\_S$ in the first place?
 4. How do we make predictions with this approximate posterior?
 5. How does subnetwork inference perform in practice?
 
-Let’s start with question (1).
+Let’s start with Q1.
 
-## (1) How do we choose and infer the subnetwork posterior ?
+## Q1. How do we choose and infer the subnetwork posterior ?
 
 In this work, we infer a full-covariance Gaussian posterior over the subnetwork using the Laplace approximation, which is a classic approximate inference technique. If you don't recall how the Laplace approximation works, below we provide a short summary. For more details on the Laplace approximation and a review of its use in deep learning, please refer to [Daxberger et al. (2021)](https://arxiv.org/abs/2106.14806).
 
 The Laplace approximation proceeds in two steps.
 1. Obtain a point estimate over all model weights using maximum a-posteriori (short MAP) inference. In deep learning, this is typically done using stochastic gradient-based optimisation methods such as SGD.
 \begin{equation}
-   \hat\vw = \argmax\_{\vw} \, [\log p(\vy \cond \mX, \vw) + \log p(\vw)]
+   \widehat\vw = \argmax\_{\vw} \, [\log p(\vy \cond \mX, \vw) + \log p(\vw)]
 \end{equation}
 
 2. Locally approximate the log-density of the posterior with a second-order Taylor expansion. This produces a full-covariance Gaussian posterior over the weights, where the mean of the Gaussian is simply the MAP estimate, and the covariance matrix of the Gaussian is the inverse Hessian $\mH$ of the loss with respect to the weights $\vw$ (averaged over the training data points):
 \begin{equation}
-   p(w \cond \D) \approx q(\vw) = \Normal(\vw \cond \hat\vw, \mH^{-1}).
+   p(w \cond \D) \approx q(\vw) = \Normal(\vw \cond \widehat\vw, \mH^{-1}).
 \end{equation}
 
 What this essentially does is it defines a Gaussian centered at the MAP estimate, with a covariance matrix that matches the curvature of the loss at the MAP estimate, as illustrated in [Figure 2](#figure-laplace).
@@ -106,14 +106,13 @@ The main advantage of the Laplace approximation, and also the reason why we use 
 
 Fortunately, in our case, we don’t actually want to do inference over _all_ the weights, but only over a subnetwork. In this case, the second step of the Laplace approximation involves inferring a full-covariance Gaussian posterior over only the subnetwork weights $\vw\_S$:
 \begin{equation}
-   p(\vw\_S \cond \D) \approx q(\vw\_S) = \Normal(\vw\_S \cond \hat\vw\_S, \mH\_S^{-1}).
+   p(\vw\_S \cond \D) \approx q(\vw\_S) = \Normal(\vw\_S \cond \widehat\vw\_S, \mH\_S^{-1}).
 \end{equation}
 This is now tractable, since the subnetwork will in practice be substantially smaller than the full network, effectively giving us quadratic gains in space complexity and cubic gains in time complexity!
 
+## Q2. How do we set the fixed values $\widehat{\mathbf{w}}\_r$ of all remaining weights $\{\mathbf{w}\_r\}\_r$?
 
-## (2) How do we set the fixed values $\widehat{\mathbf{w}}\_r$ of all remaining weights $\{\mathbf{w}\_r\}\_r$?
-
-In fact, this also answers question (2) of how to set the remaining weights not part of the subnetwork: Since the Laplace approximation requires us to first obtain a MAP estimate over all weights, it’s natural to simply leave all other weights at their MAP estimates!
+In fact, this also answers Q2 of how to set the remaining weights not part of the subnetwork: Since the Laplace approximation requires us to first obtain a MAP estimate over all weights, it’s natural to simply leave all other weights at their MAP estimates!
 
 Let’s now look at how subnetwork inference is done in practice.
 
@@ -122,7 +121,7 @@ Let’s now look at how subnetwork inference is done in practice.
 
 Overall, our proposed subnetwork inference algorithm comprises the following four steps:
 
-1. The first step is to obtain a MAP estimate over all the weights of the neural net using standard optimisation methods such as SGD (see [Figure 3](#figure-map)).
+1. Obtain a MAP estimate over all the weights of the neural net using standard optimisation methods such as SGD (see [Figure 3](#figure-map)).
 {% include image.html
     name="Figure 3"
     ref="map"
@@ -131,7 +130,8 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
     width=400
 %}
 
-2. The second step is to select a small subnetwork (see [Figure 4](#figure-subnet)) --- we'll discuss in a second how this can be done in practice.
+{: start="2" }
+2. Select a small subnetwork (see [Figure 4](#figure-subnet)) --- we'll discuss in a second how this can be done in practice.
 {% include image.html
     name="Figure 4"
     ref="subnet"
@@ -140,7 +140,8 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
     width=400
 %}
 
-3. The third step is to perform Bayesian inference just over the subnetwork (see [Figure 5](#figure-inference)). As described above, we use the Laplace approximation to infer a full-covariance Gaussian over the subnetwork, and leave all other weights at their MAP estimates.
+{: start="3" }
+3. Perform Bayesian inference just over the subnetwork (see [Figure 5](#figure-inference)). As described above, we use the Laplace approximation to infer a full-covariance Gaussian over the subnetwork, and leave all other weights at their MAP estimates.
 {% include image.html
     name="Figure 5"
     ref="inference"
@@ -149,7 +150,8 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
     width=400
 %}
 
-4. And, lastly, the final step is to use the resulting, mixed probabilistic-deterministic model to make predictions (see [Figure 6](#figure-prediction)).
+{: start="4" }
+4. Lastly, use the resulting mixed probabilistic--deterministic model to make predictions (see [Figure 6](#figure-prediction)).
 {% include image.html
     name="Figure 6"
     ref="prediction"
@@ -161,37 +163,35 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
 Ok, now we know how to do inference over the subnetwork, but how do we find the subnetwork in the first place?
 
 
-## (3) How do we select the subnetwork $\mathbf{w}\_S$ in the first place?
+## Q3. How do we select the subnetwork $\mathbf{w}\_S$ in the first place?
 
 Recall that we want to preserve as much model uncertainty as possible with our subnetwork. A natural goal is therefore to find the subnetwork whose posterior is _closest_ to the full network posterior. That is, we want to find the subset of weights that minimises some measure of discrepancy between the posterior over the full network and the posterior over the subnetwork.
 
 To measure this discrepancy, we choose to use the Wasserstein distance:
-
-\begin{equation}
-    &\min \text{Wass}[\ \text{exact full posterior}\ \|\ \text{subnetwork posterior}\ ] 
-    &= \min \text{Wass}[\ p(\mathbf{w} \cond \mathcal{D})\ \|\ q\_S(\mathbf{w})\ ] 
-    &\approx \min \text{Wass}\left[\ \mathcal{N}\left(\mathbf{w}; \widehat{\mathbf{w}}, \mathbf{H}^{-1}\right)\ \|\ \mathcal{N}(\mathbf{w}\_S; \widehat{\mathbf{w}}\_S, \mathbf{H}\_S^{-1}) \prod\_r \delta(\mathbf{w}\_r - \widehat{\mathbf{w}}\_r )\ \right].
-\end{equation}
-
-As the exact full network posterior $p(\mathbf{w} \cond \mathcal{D})$ is intractable, we here approximate it as a Gaussian $\mathcal{N}\left(\mathbf{w}; \widehat{\mathbf{w}}, \mathbf{H}^{-1}\right)$ over all weights (also estimated via the Laplace approximation). Also, as described earlier, the subnetwork posterior $q\_S(\mathbf{w})$ is composed of a Gaussian $\mathcal{N}(\mathbf{w}\_S; \widehat{\mathbf{w}}\_S, \mathbf{H}\_S^{-1})$ over the subnetwork and delta functions $\delta(\mathbf{w}\_r - \widehat{\mathbf{w}}\_r )$ over all other weights $\{\mathbf{w}\_r\}\_r$. Note that due to the delta functions, the subnetwork posterior is degenerate; this is why we use the Wasserstein distance, which remains well-defined for such degenerate distributions. 
+\begin{align}
+    &\min \text{Wass}[\ \text{exact full posterior}\ \|\ \text{subnetwork posterior}\ ] \nonumber \vphantom{\prod} \newline
+    &\qquad= \min \text{Wass}[\ p(\mathbf{w} \cond \mathcal{D})\ \|\ q\_S(\mathbf{w})\ ] \vphantom{\prod} \newline
+    &\qquad\approx \min \text{Wass}[\ \mathcal{N}\left(\mathbf{w}; \widehat{\mathbf{w}}, \mathbf{H}^{-1}\right)\ \|\ \mathcal{N}(\mathbf{w}\_S; \widehat{\mathbf{w}}\_S, \mathbf{H}\_S^{-1}) \prod\_{r \in S^\c} \delta(\mathbf{w}\_r - \widehat{\mathbf{w}}\_r )\ ].
+\end{align}
+As the exact full network posterior $p(\mathbf{w} \cond \mathcal{D})$ is intractable, we here approximate it as a Gaussian $\mathcal{N}\left(\mathbf{w}; \widehat{\mathbf{w}}, \mathbf{H}^{-1}\right)$ over all weights (also estimated via the Laplace approximation). Also, as described earlier, the subnetwork posterior $q\_S(\mathbf{w})$ is composed of a Gaussian $\mathcal{N}(\mathbf{w}\_S; \widehat{\mathbf{w}}\_S, \mathbf{H}\_S^{-1})$ over the subnetwork and delta functions $\delta(\mathbf{w}\_r - \widehat{\mathbf{w}}\_r )$ over all other weights $\\{\mathbf{w}\_r\\}\_{r \in S^\c}$. Note that due to the delta functions, the subnetwork posterior is degenerate; this is why we use the Wasserstein distance, which remains well-defined for such degenerate distributions. 
 
 Unfortunately, this objective is still intractable, as it depends on all entries of the Hessian of the full network. To obtain a tractable objective, we assume that the full network posterior is factorised. By making this factorisation assumption, the Wasserstein objective now only depends on the diagonal entries of the Hessian, which are cheap to compute. I know what you’re thinking right now: “Didn’t they just tell us that the whole point of this subnetwork inference thing is to avoid making the assumption that the posterior is diagonal? And now they're telling us that, actually, we still do have to make this assumption? This doesn’t make any sense!”
 
-Well, in fact, it turns out that making the diagonal assumption _just for the purpose of subnetwork selection_, but then doing _full-covariance_ Gaussian posterior inference over the subnetwork is much better than making the diagonal assumption for the purpose of inference itself (i.e. inference over the weights of the subnetwork and even over _all_ weights), which we’ll see in the experiments later.
+Well, in fact, it turns out that making the diagonal assumption _just for the purpose of subnetwork selection_, but then doing _full-covariance_ Gaussian posterior inference over the subnetwork is much better than making the diagonal assumption for the purpose of inference itself (_i.e._ inference over the weights of the subnetwork and even over _all_ weights), which we’ll see in the experiments later.
 
 All in all, our proposed subnetwork selection procedure is as follows:
-1. First, estimate a factorised Gaussian posterior over all weights, using for example a diagonal Laplace approximation.
-2. Second, select those weights with the largest marginal variances. Why the weights with largest marginal variances? Well, one can show that, under the diagonal assumption, those are the weights that minimise the Wasserstein objective defined above.
+1. Estimate a factorised Gaussian posterior over all weights, using for example a diagonal Laplace approximation.
+2. Select those weights with the largest marginal variances. Why the weights with largest marginal variances? Well, one can show that, under the diagonal assumption, those are the weights that minimise the Wasserstein objective defined above.
 
 
-## (4) How do we make predictions with this approximate posterior?
+## Q4. How do we make predictions with this approximate posterior?
 
 Great, we now know that a subnetwork can be found by (approximately) minimising the Wasserstein distance between the subnetwork posterior and the full network posterior. But how do we make predictions with this weird approximate posterior that is partly probabilistic and partly deterministic? We simply use all the weights of the neural net to make predictions: we integrate out the weights in the subnetwork, and just leave all other weights fixed at their MAP estimates. For integrating out the subnetwork weights, one can either use Monte Carlo or a closed-form approximation --- please refer to the full paper for more details (the reference is given at the end of this blog post). Subnetwork inference therefore combines the strong predictive accuracy of the MAP estimate with the calibrated uncertainties of a Bayesian posterior. 
 
 Finally, we will now demonstrate the effectiveness of subnetwork inference in two experiments.
 
 
-## (5) How does subnetwork inference perform in practice?
+## Q5. How does subnetwork inference perform in practice?
 
 ### Experiment 1: How does subnetwork inference preserve predictive uncertainty?
 
@@ -202,7 +202,7 @@ In the first experiment we train a small, 2-layer, fully-connected network with 
     ref="regression"
     alt="Predictive distributions (mean $\pm$ std) for 1D regression. The numbers in parentheses denote the number of parameters over which inference was done (out of 2600 in total). Wasserstein subnetwork inference maintains richer predictive uncertainties at smaller parameter counts."
     src="subnetwork-inference/regression.png"
-    width=700
+    width=500
 %}
 
 The number in brackets in the plot title denotes the number of weights over which we do inference; for example, for the MAP estimate ([Figure 7](#figure-regression), top left), inference was done over zero weights. As you can see, the 1D function we’re trying to fit consists of two separated clusters of data, and the goal here is to capture as much of the predictive uncertainty as possible, especially in-between those data clusters ([Foong _et al._, 2019](https://arxiv.org/abs/1906.11537)). As expected, the point estimate ([Figure 7](#figure-regression), top left) doesn’t capture any uncertainty, but instead makes confident predictions even in regions where there’s no data, which is bad.
@@ -235,7 +235,7 @@ We consider two benchmarks for evaluating robustness to distribution shift which
     name="Figure 9"
     ref="mnist" alt="Results on the rotated MNIST benchmark, showing the mean $\pm$ std of the test error (top) and log-likelihood (bottom) across three different seeds. Subnetwork inference achieves better uncertainty calibration and robustness to distribution shift than point-estimated networks and other Bayesian deep learning approaches (except for VOGN), while retaining accuracy."
     src="subnetwork-inference/mnist.png"
-    width=700
+    width=450
 %}
 
 Let’s start with rotated MNIST ([Figure 9](#figure-mnist)). On the x-axis, we have the degree of rotation, and on the y-axis, we plot two different metrics: on top, we plot the test errors achieved by the different methods (where lower values are better), and on the bottom, we plot the corresponding log-likelihood, as a measure of calibration (where higher values are better). Here, we see that MAP, diagonal Laplace, MC dropout, the deep ensemble, SWAG, and the random subnetwork baseline all perform roughly similarly in terms of calibration ([Figure 9](#figure-mnist), bottom): their calibration becomes worse as we increase the degree of rotation; in contrast to that, subnetwork inference (shown in dark blue) remains much better calibrated, even at high degrees of rotation. The only competitive method here is VOGN, which slightly outperforms subnetwork inference in terms of calibration. Importantly, observe that this increase in robustness does _not_ come at cost of accuracy ([Figure 9](#figure-mnist), top): Wasserstein subnetwork inference (as well as VOGN) retain the same accuracy as the other methods.
@@ -245,7 +245,7 @@ Let’s start with rotated MNIST ([Figure 9](#figure-mnist)). On the x-axis, we 
     ref="cifar10"
     alt="Results on the corrupted CIFAR-10 benchmark, showing the mean $\pm$ std of the test error (top) and log-likelihood (bottom) across three different seeds. Subnetwork inference achieves better uncertainty calibration and robustness to distribution shift than point-estimated networks and other Bayesian deep learning approaches, while retaining accuracy."
     src="subnetwork-inference/cifar10.png"
-    width=700
+    width=450
 %}
 
 Now let’s look at corrupted CIFAR10 ([Figure 10](#figure-cifar10)). There, the story is somewhat similar: we plot the corruption severity on the x-axis versus the error ([Figure 10](#figure-cifar10), top) and log-likelihood ([Figure 10](#figure-cifar10), bottom) on the y-axis. Here, MAP, diagonal Laplace, MC dropout and the random subnetwork baseline are all poorly calibrated ([Figure 10](#figure-cifar10), bottom). VOGN, SWAG and deep ensembles are a bit better calibrated, but are still significantly outperformed by subnetwork inference (again in dark blue), even at high corruption severities. Importantly, the improved robustness of Wasserstein subnetwork inference again does _not_ compromise accuracy ([Figure 10](#figure-cifar10), top). In contrast, the accuracy of VOGN suffers on this dataset.
@@ -255,7 +255,7 @@ Overall, the take-away from this experiment is that subnetwork inference is bett
 
 ## Take-home message
 
-To conclude, in this blog post, we described subnetwork inference, which is a Bayesian deep learning method that does expressive inference over a carefully chosen subnetwork within a neural network. We also showed some empirical results suggesting that this works better than doing crude inference over the full network. There remain clear limitations of this work that deserve more investigation in the future: The most important one is to develop better subnetwork selection strategies that avoid the potentially restrictive approximations we use (i.e. the diagonal approximation to the posterior covariance matrix).
+To conclude, in this blog post, we described subnetwork inference, which is a Bayesian deep learning method that does expressive inference over a carefully chosen subnetwork within a neural network. We also showed some empirical results suggesting that this works better than doing crude inference over the full network. There remain clear limitations of this work that deserve more investigation in the future: The most important one is to develop better subnetwork selection strategies that avoid the potentially restrictive approximations we use (_i.e._ the diagonal approximation to the posterior covariance matrix).
 
 Thanks a lot for reading this blog post! If you want to learn more about this work, please feel free to check out our full ICML 2021 paper:
 - Erik Daxberger, Eric Nalisnick, James Urquhart Allingham, Javier Antorán, José Miguel Hernández-Lobato. [Bayesian Deep Learning via Subnetwork Inference](https://arxiv.org/abs/2010.14689). In _ICML 2021_.

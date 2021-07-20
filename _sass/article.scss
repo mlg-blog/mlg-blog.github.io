@@ -208,7 +208,7 @@ main {
     ul p, ol p {
         margin: 0;
     }
-    ol.parentheses {
+    ol.custom {
         counter-reset: list;
 
         &>li {
@@ -217,11 +217,17 @@ main {
 
             &:before {
                 counter-increment: list;
-                content: "(" counter(list, number) ") ";
                 position: absolute;
-                left: -1.4em;
             }
         }
+    }
+    ol.parentheses > li:before {
+        content: "(" counter(list, number) ") ";
+        left: -1.4em;
+    }
+    ol.questions > li:before {
+        content: "Q" counter(list, number) ". ";
+        left: -1.8em;
     }
 
     // Tables
