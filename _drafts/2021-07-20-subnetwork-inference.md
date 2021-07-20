@@ -110,7 +110,7 @@ Fortunately, in our case, we don’t actually want to do inference over _all_ th
 \end{equation}
 This is now tractable, since the subnetwork will in practice be substantially smaller than the full network, effectively giving us quadratic gains in space complexity and cubic gains in time complexity!
 
-## Q2. How do we set the fixed values $\widehat{\mathbf{w}}\_r$ of all remaining weights $\{\mathbf{w}\_r\}\_r$?
+## Q2. How do we set the fixed values $\widehat{\mathbf{w}}\_r$ of all remaining weights $\\{\mathbf{w}\_r\\}\_{r \in S^\c}$?
 
 In fact, this also answers Q2 of how to set the remaining weights not part of the subnetwork: Since the Laplace approximation requires us to first obtain a MAP estimate over all weights, it’s natural to simply leave all other weights at their MAP estimates!
 
