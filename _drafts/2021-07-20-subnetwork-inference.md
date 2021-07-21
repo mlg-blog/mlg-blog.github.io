@@ -68,6 +68,7 @@ The first step (i) of our posterior approximation then involves a posterior dist
 
 There are a few questions that we still need to answer:
 
+{: class="custom questions" }
 1. How do we choose and infer the subnetwork posterior $q(\vw\_S)$? That is, what form does $q$ have, and how do we infer its parameters?
 2. How do we set the fixed values $\widehat\vw\_r$ of all remaining weights $\\{\vw\_r\\}\_{r \in S^\c}$?
 3. How do we select the subnetwork $\vw\_S$ in the first place?
