@@ -10,7 +10,7 @@ authors:
 comments:   true
 image:      /assets/images/subnetwork-inference/d_prediction.png
 excerpt: |
-    This blog post describes <i>subnetwork inference</i>, a Bayesian deep learning method where inference is done over only a small, carefully selected subset of the model weights instead of all weights. This allows using expressive posterior approximations (<i>e.g.</i> full covariance Gaussian distributions) that would otherwise be intractable.
+    Bayesian inference has the potential to address shortcomings of deep neural networks (DNNs) such as poor calibration. However, scaling Bayesian methods to modern DNNs is challenging. This blog post describes <i>subnetwork inference</i>, a method that tackles this issue by doing inference over only a small, carefully selected subset of the DNN weights.
 ---
 
 
@@ -44,7 +44,7 @@ It turns out that you often don’t need all those weights. In particular, recen
    ref="pruning"
    alt="An illustration of neural network pruning (<a href=\"https://arxiv.org/abs/1506.02626\">Han <i>et al.</i>, 2015</a>)."
    src="subnetwork-inference/pruning.png"
-   width=700
+   width=500
 %}
 
 As shown in [Figure 1](#figure-pruning), pruning techniques typically first train the neural net, and then, after training, remove certain weights or even entire neurons according to some criterion. There has been a lot of recent interest in this research direction; for example, the best paper award at ICLR 2019 went to Jonathan Frankle and Michael Carbin’s now famous work on the lottery ticket hypothesis ([Frankle and Carbin, 2018](https://arxiv.org/abs/1803.03635)), which showed that you can even retrain the pruned network from scratch and still achieve the same accuracy as the full network.
@@ -68,7 +68,6 @@ The first step (i) of our posterior approximation then involves a posterior dist
 
 There are a few questions that we still need to answer:
 
-{: class="custom questions" }
 1. How do we choose and infer the subnetwork posterior $q(\vw\_S)$? That is, what form does $q$ have, and how do we infer its parameters?
 2. How do we set the fixed values $\widehat\vw\_r$ of all remaining weights $\\{\vw\_r\\}\_{r \in S^\c}$?
 3. How do we select the subnetwork $\vw\_S$ in the first place?
@@ -97,7 +96,7 @@ What this essentially does is it defines a Gaussian centered at the MAP estimate
 {% include image.html
    name="Figure 2"
    ref="laplace"
-   alt="A conceptual illustration of the Laplace approximation in one dimension (image adapted with kind permission from Richard Turner). We plot the parameter $\mathbf{w}$ (x-axis) against the density of the true posterior $p(\mathbf{w}\cond\mathcal{D})$ (in black) as well as that of the corresponding Laplace approximation $q(\mathbf{w})$ (in red). As we can see, $q(\mathbf{w})$ is a Gaussian centered at the mode $\widetilde{\mathbf{w}}$ of the posterior $p(\mathbf{w}\cond\mathcal{D})$, with covariance matrix matching the curvature of $p(\mathbf{w}\cond\mathcal{D})$ at $\widetilde{\mathbf{w}}$."
+   alt="A conceptual illustration of the Laplace approximation in one dimension (image adapted with kind permission from Richard Turner). We plot the parameter $\mathbf{w}$ (x-axis) against the density of the true posterior $p(\mathbf{w}\cond\mathcal{D})$ (in black) as well as that of the corresponding Laplace approximation $q(\mathbf{w})$ (in red). As we can see, $q(\mathbf{w})$ is a Gaussian centered at the mode $\widehat{\mathbf{w}}$ of the posterior $p(\mathbf{w}\cond\mathcal{D})$, with covariance matrix matching the curvature of $p(\mathbf{w}\cond\mathcal{D})$ at $\widehat{\mathbf{w}}$."
    src="subnetwork-inference/laplace.png"
    width=400
 %}
@@ -127,7 +126,7 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
     ref="map"
     alt="Step 1: Point estimation."
     src="subnetwork-inference/a_map.png"
-    width=400
+    width=300
 %}
 
 {: start="2" }
@@ -137,7 +136,7 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
     ref="subnet"
     alt="Step 2: Subnetwork selection."
     src="subnetwork-inference/b_subnet.png"
-    width=400
+    width=300
 %}
 
 {: start="3" }
@@ -147,7 +146,7 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
     ref="inference"
     alt="Step 3: Bayesian inference."
     src="subnetwork-inference/c_inference.png"
-    width=400
+    width=300
 %}
 
 {: start="4" }
@@ -157,7 +156,7 @@ Overall, our proposed subnetwork inference algorithm comprises the following fou
     ref="prediction"
     alt="Step 4: Prediction."
     src="subnetwork-inference/d_prediction.png"
-    width=400
+    width=300
 %}
 
 Ok, now we know how to do inference over the subnetwork, but how do we find the subnetwork in the first place?
@@ -220,13 +219,13 @@ Overall, the take-away from this experiment is that doing expressive inference o
 
 Ok, 1D regression is fun, but we’re of course interested in scaling this to more realistic settings. In this second experiment, we consider the task of image classification under distribution shift. This task is much more challenging than 1D regression, so the model that we use is significantly larger than before: we use a ResNet-18 model with over 11 million weights, and, to remain tractable, we do inference over as little as 42 thousand (which is only around 0.38%) of the weights, again found using Wasserstein minimisation.
 
-We consider five baselines: the MAP estimate, a diagonal Laplace approximation over all 11M weights, Monte Carlo (MC) dropout over all weights ([Gal and Ghahramani, 2015](https://arxiv.org/abs/1506.02142)), Variational Online Gauss-Newton (short VOGN, [Osawa _et al._ (2019)](https://arxiv.org/abs/1906.02506)), which estimates a factorised Gaussian over all weights, a Deep Ensemble ([Lakshminarayanan _et al._, 2017](https://arxiv.org/abs/1612.01474)) of 5 independently trained ResNet-18 models, and Stochastic Weight Averaging Gaussian (short SWAG, [Maddox _et al._ (2019)](https://arxiv.org/abs/1902.02476)), which estimates a low-rank plus diagonal posterior over all weights. As another baseline, we also consider subnetwork inference with a _randomly selected subnetwork_ (denoted _Ours (Rand)_), which will allow us to assess the impact of how the subnetwork is chosen.
+We consider five baselines: the MAP estimate, a diagonal Laplace approximation over all 11M weights, Monte Carlo (MC) dropout over all weights ([Gal and Ghahramani, 2015](https://arxiv.org/abs/1506.02142)), Variational Online Gauss-Newton (short VOGN, [Osawa _et al._, 2019](https://arxiv.org/abs/1906.02506)), which estimates a factorised Gaussian over all weights, a Deep Ensemble ([Lakshminarayanan _et al._, 2017](https://arxiv.org/abs/1612.01474)) of 5 independently trained ResNet-18 models, and Stochastic Weight Averaging Gaussian (short SWAG, [Maddox _et al._, 2019](https://arxiv.org/abs/1902.02476)), which estimates a low-rank plus diagonal posterior over all weights. As another baseline, we also consider subnetwork inference with a _randomly selected subnetwork_ (denoted _Ours (Rand)_), which will allow us to assess the impact of how the subnetwork is chosen.
 
 {% include image.html
     name="Figure 8"
     ref="benchmarks" alt="Example images from the (top) rotated MNIST and (bottom) corrupted CIFAR-10 benchmarks. (Top) An image of the digit 2 is increasingly rotated. (Bottom) An image of a dog is increasingly blurred."
     src="subnetwork-inference/benchmarks.png"
-    width=400
+    width=450
 %}
 
 We consider two benchmarks for evaluating robustness to distribution shift which were recently proposed by [Ovadia _et al._ (2019)](https://arxiv.org/abs/1906.02530) ([Figure 8](#figure-benchmarks)): firstly, we have rotated MNIST, where the model is trained on the standard MNIST training set, and then at test time evaluated on increasingly rotated MNIST digits (as for example shown for the digit 2 in [Figure 8](#figure-benchmarks), top); and secondly, we consider corrupted CIFAR-10, where we again train on the standard CIFAR-10 training set, but then evaluate on corrupted CIFAR-10 images; the test set contains over a dozen different corruption types, with five levels of increasing corruption severity (in this example, the image of a dog in [Figure 8](#figure-benchmarks), bottom, is getting more and more blurry from left to right).
