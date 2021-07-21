@@ -222,11 +222,11 @@ main {
         }
     }
     ol.parentheses > li:before {
-        content: "(" counter(list, number) ") ";
+        content: "(" counter(list) ") ";
         left: -1.4em;
     }
     ol.questions > li:before {
-        content: "Q" counter(list, number) ". ";
+        content: "Q" counter(list) ". ";
         left: -1.8em;
     }
 
