@@ -225,6 +225,13 @@ main {
         content: "(" counter(list) ") ";
         left: -1.4em;
     }
+    ol.parentheses_roman > li:before {
+        content: "(" counter(list, lower-roman) ") ";
+        text-align: right;
+        display: inline-block;
+        width: 30px;
+        left: -2.3em;
+    }
     ol.questions > li:before {
         content: "Q" counter(list) ". ";
         left: -1.8em;
