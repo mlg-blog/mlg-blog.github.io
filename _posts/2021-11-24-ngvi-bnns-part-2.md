@@ -62,7 +62,6 @@ Our dataset consists of $N$ data examples, and we are taking per-example gradien
 For a randomly-sampled minibatch $\mathcal{M}_t$ of size $M$, we have defined the average gradient ${\color{purple}\hat{\vg}(\vparam\_t)} = \frac{1}{M}\sum\_{i\in\mathcal{M}\_t} {\color{purple}\vg\_i(\vparam\_t)}$.
 There is a simple relation between $\vSigma_t$ and $\vs_t$, $\vSigma_t^{-1} = N\vs_t + {\color{blue}\delta \vI}$.
 Finally, $\alpha_t>0$ and $0<\beta_t<1$ are learning rates, and all operations are element-wise.
-<!-- We obtain $\vs_t$ as a simple function of $\vSigma_t$: $\vs_t = (\vSigma_t^{-1} - {\color{blue}\delta \vI}) / N$. -->
 
 It turns out that this update equation is very similar to Adam ([Kingba & Ba, 2015](https://arxiv.org/pdf/1412.6980.pdf)). To see this, let's write down the form that commonly-used optimisers take, such as SGD, RMSProp ([Hinton, 2012](https://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)), and Adam:
 
@@ -104,7 +103,6 @@ We can also use momentum for VOGN in a similar way to Adam: we introduce momentu
 Over many years of training neural networks with SGD and Adam, the community has found tricks to speed up training using clever initialisation. We can get these same benefits by changing VOGN to look more like Adam at initialisation, before slowly relaxing our algorithm to become the full VOGN algorithm later in training.
 
 This is achieved by introducing a tempering parameter $\tau$ in front of the KL term in the ELBO, which propagates its way through to the VOGN equations. To see exactly where $\tau$ crops up, please look at Equation 4 from  [Osawa et al. (2019)](https://arxiv.org/pdf/1906.02506.pdf), or see [Algorithm 1](#figure-VOGNalgorithm) below. As $\tau\rightarrow 0$, we (loosely speaking) get more similar to Adam. So, at the beginning of training, we initialise $\tau$ at something small (like $0.1$) and increase to $1$ during the first few optimisation steps.
-<!-- As we always reach $\tau=1$ quite early during training, we still converge to a solution of the full ELBO. -->
 
 Other initialisations are the same as Adam: $\vmu_t$ is initialised using `init.xavier_normal` from PyTorch ([Glorot & Bengio, 2010](https://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf)) and the momentum term is initialised to zero, like in Adam. VOGN's $\vs_t$ is initialised using an additional forward pass through the first minibatch of data.
 
@@ -141,7 +139,7 @@ One downside of VOGN when compared to Adam is the additional hyperparameters tha
 {% include image.html
   name="Algorithm 1"
   ref="VOGNalgorithm"
-  alt="Final algorithm, ready for running on ImageNet. Additional notes explaining key steps are in red. The vanilla VOGN equations (Equations \eqref{eq:VOGN_mu} and \eqref{eq:VOGN_Sigma}) are in Steps 8--12 & 18--19. The final list of hyperparameters are summarised in the bottom right. The final four hyperparameters are specific to VOGN, and we provide best practices for tuning them at the end of the blog post."
+  alt="Final algorithm, ready for running on ImageNet. Additional notes explaining key steps are in red. The vanilla VOGN equations (Equations \eqref{eq:VOGN_mu} and \eqref{eq:VOGN_Sigma}) are in Steps 8–12 & 18–19. The final list of hyperparameters are summarised in the bottom right. The final four hyperparameters are specific to VOGN, and we provide best practices for tuning them at the end of the blog post."
   src="ngvi-bnns/VOGN_algorithm_figure.png"
   width=700
 %}
@@ -179,9 +177,6 @@ Due to the Bayesian nature of VOGN, we see some interesting trade-offs (see the 
 1. Reducing the prior precision $\delta$ results in higher validation accuracy, but also a larger train-test gap, corresponding to more overfitting. With very small prior precisions, performance is similar to non-Bayesian methods like Adam.
 
 2. Increasing the number of training MC samples ($K$ in [Algorithm 1](#figure-VOGNalgorithm)) improves VOGN's convergence rate and stability, as it reduces gradient variance during training. But this is at the cost of increased computation. Increasing the number of MC samples during testing improves generalisation.
-
-
-<!-- Crucially, all algorithms are trained for the same number of epochs, meaning that the total training time for VOGN is of the same order of magnitude as that for Adam. Note that in VOGN we need to choose the number of MC samples per iteration (in the previous blog post we noted that increasing the number of samples would reduce variance during training). For CIFAR-10, we sometimes take >1 MC samples per iteration, meaning that VOGN is more than twice as slow as Adam. This is to stabilise gradient variance during training, speeding up convergence (number of epochs) and converging to a better solution. More sophisticated algorithms could consider changing the number of MC samples during training when it matters: early on in training, we only need approximate gradients, and so 1 MC sample is enough, while later in training, gradient variance becomes more important and more MC samples leads to better performance. -->
 
 ## Downstream uncertainty performance
 
