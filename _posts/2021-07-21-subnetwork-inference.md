@@ -1,7 +1,7 @@
 ---
 layout:      post
 title:       "Bayesian Deep Learning via Subnetwork Inference"
-tags:        [bayesian inference, deep learning]
+tags:        [Bayesian inference, deep learning]
 authors:
     - name: Erik Daxberger
       link: https://edaxberger.github.io
@@ -51,7 +51,7 @@ As shown in [Figure 1](#figure-pruning), pruning techniques typically first trai
 
 But how does this help us? We asked ourselves the exact same question about the model uncertainty: Can a full deep neural net's model uncertainty be well-preserved by a small subnetwork’s model uncertainty? It turns out that the answer is yes, and in the remainder of this blog post, you will learn about how we came to this conclusion.
 
-## Our proposed approximation to the posterior 
+## Our proposed approximation to the posterior
 
 Assume that we have divided the weights $\vw$ into two disjoint subsets: (1) the subnetwork $\vw\_S$ and (2) the set of all remaining weights $\\{\vw\_r\\}\_{r \in S^\c}$. We will later describe how we select the subnetwork; for now, just assume that we have it already. We propose to approximate the posterior distribution over as follows:
 \begin{equation}
