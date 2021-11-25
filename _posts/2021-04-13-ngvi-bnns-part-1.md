@@ -24,7 +24,7 @@ This first part will involve quite a lot of detailed maths: we will derive a nat
 We will follow the appendices in [Khan et al. (2018)](https://arxiv.org/pdf/1806.04854.pdf).
 NGVI algorithms are in contrast to stochastic gradient algorithms such as Bayes-By-Backprop ([Blundell et al., 2015](https://arxiv.org/pdf/1505.05424.pdf)), which also optimises the same Bayesian VI objective function, and also in contrast to Adam and SGD, which optimise for a non-Bayesian estimate of neural network weights.
 
-In the second part of the blog, we will work our way to large datasets/architectures such as ImageNet/ResNets, discussing additional approximations required, as well as analysing their promising results. The second part will closely follow a paper I was involved in, [Osawa et al. (2019)](https://arxiv.org/pdf/1906.02506.pdf).
+In the [second part of the blog](https://mlg-blog.com/2021/11/24/ngvi-bnns-part-2.html), we will work our way to large datasets/architectures such as ImageNet/ResNets, discussing additional approximations required, as well as analysing their promising results. The second part will closely follow a paper I was involved in, [Osawa et al. (2019)](https://arxiv.org/pdf/1906.02506.pdf).
 
 I hope to leave the reader with an understanding of how NGVI algorithms for NNs are derived, and some intuition for their strengths and weaknesses.
 I will **not** discuss other Bayesian neural network algorithms, nor get involved in the recent debates over what it means to be 'Bayesian' in deep learning!
@@ -158,7 +158,7 @@ Plugging the ELBO (with this simplification) into Equation \eqref{eq:NGD},
    \therefore \veta_{t+1} &= (1-\beta_t) \veta_t + \beta_t \Big({\color{blue}\veta_0} + \nabla_\vm \underbrace{\myexpect_{q_{\veta_t}(\vparam)} \left[\log {\color{purple}p(\data\pipe\vparam)}\right]}\_{ {\color{purple}\Large\mathcal{F}\_t}} \Big).
 \end{align}
 
-This equation is presented and analysed in detail in [Khan & Rue (2020)](https://emtiyaz.github.io/papers/learning_from_bayes.pdf), where it is called the 'Bayesian learning rule'.
+This equation is presented and analysed in detail in [Khan & Rue (2021)](https://arxiv.org/pdf/2107.04562.pdf), where it is called the 'Bayesian learning rule'.
 I recommend reading the paper if you are interested in this and related topics: they show how this equation appears in many different scenarios (beyond just the Bayesian derivation presented above), and also consider extensions beyond what we consider in this blog post. This allows them to connect to a plethora of different learning algorithms ranging from Newton's method to Kalman filters to Adam.
 
 ### Gaussian approximating family
@@ -283,4 +283,4 @@ For now, we borrow Figure 1(b) from [Khan & Nielsen (2018)](https://arxiv.org/pd
 
 I hope you now understand NGVI for BNNs a little better. You have seen how the equations are derived, and hopefully have more of a feel for why and when they might work. There was a lot of detailed maths, but I have tried to provide some intuition and make all our approximations clear.
 
-In this first part, we stopped at VOGN on small neural networks. In the second part, we will compare VOGN with stochastic gradient-based algorithms such as SGD and Adam to provide some further intuition. We will take some inspiration from Adam to scale VOGN to much larger datasets/architectures, such as ImageNet/ResNets. The next blog post will be a lot less mathematical!
+In this first part, we stopped at VOGN on small neural networks. In the [second part](https://mlg-blog.com/2021/11/24/ngvi-bnns-part-2.html), we will compare VOGN with stochastic gradient-based algorithms such as SGD and Adam to provide some further intuition. We will take some inspiration from Adam to scale VOGN to much larger datasets/architectures, such as ImageNet/ResNets. The next blog post will be a lot less mathematical!
