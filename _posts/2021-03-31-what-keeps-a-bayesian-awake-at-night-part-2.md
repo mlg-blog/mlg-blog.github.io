@@ -103,7 +103,7 @@ So, when we teach the ideas of probabilistic modelling and inference and write b
 
 [^6]: [Savage's (1962)](https://doi.org/10.2307/2281641) comment on personal probability that was reproduced at the start of this post captures this sentiment well. 
 
-[^7]: Andrew Gelman and David MacKay discuss this issue [here](https://statmodeling.stat.columbia.edu/2011/12/04/david-mackay-and-occams-razor/).
+[^7]: Andrew Gelman and David MacKay discuss this issue [here](https://statmodeling.stat.columbia.edu/2011/12/04/david-mackay-and-occams-razor/) and [here](https://statmodeling.stat.columbia.edu/2011/06/09/difficulties_wi/).
 
 [^8]: See also [this great answer](https://stats.stackexchange.com/a/279798) by Peter Grünwald on StackExchange.
 
