@@ -284,3 +284,6 @@ For now, we borrow Figure 1(b) from [Khan & Nielsen (2018)](https://arxiv.org/pd
 I hope you now understand NGVI for BNNs a little better. You have seen how the equations are derived, and hopefully have more of a feel for why and when they might work. There was a lot of detailed maths, but I have tried to provide some intuition and make all our approximations clear.
 
 In this first part, we stopped at VOGN on small neural networks. In the [second part](https://mlg-blog.com/2021/11/24/ngvi-bnns-part-2.html), we will compare VOGN with stochastic gradient-based algorithms such as SGD and Adam to provide some further intuition. We will take some inspiration from Adam to scale VOGN to much larger datasets/architectures, such as ImageNet/ResNets. The next blog post will be a lot less mathematical!
+
+If you would like to cite this blog post, you can use the following bibtex: 
+> @misc{swaroop_2021, title={Natural-Gradient Variational Inference}, url={https://mlg-blog.com/2021/04/13/ngvi-bnns-part-1.html}, author={Swaroop, Siddharth}, year={2021}} 
